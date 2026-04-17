@@ -28,7 +28,7 @@ Nel penetration testing il 50% è trovare la vulnerabilità. L'altro 50%? Comuni
 
 ### ⚙️ **Projects**
 
-- **[Waifu Gallery – Boot2Root Design](eth.md)** – Progettazione di una VM Ubuntu Server che ospitasse una web app vulnerabile controllata per scopo didattico. 6 vulnerabilità, 3 livelli di difficoltà, exploit chain progressiva.
+- **[Anime-themed gallery – Boot2Root Design](eth.md)** – Progettazione di una VM Ubuntu Server che ospitasse una web app vulnerabile controllata per scopo didattico. 6 vulnerabilità, 3 livelli di difficoltà, exploit chain progressiva.
 
 ---
 
