@@ -5,28 +5,29 @@ site_url: https://marcop-sed.github.io/portfolio/
 
 theme:
   name: material
+  icon:
+    logo: material/shield-key
   palette:
     # Light mode
     - scheme: default
-      primary: indigo
-      accent: cyan
+      primary: black
+      accent: red
       toggle:
         icon: material/brightness-7
         name: Dark Mode
     # Dark mode (default)
     - scheme: slate
-      primary: indigo
-      accent: cyan
+      primary: black
+      accent: red
       toggle:
         icon: material/brightness-4
         name: Light Mode
   
   font:
-    text: Roboto
+    text: Inter
     code: JetBrains Mono
   
   features:
-    - navigation.instant
     - navigation.tracking
     - navigation.tabs
     - navigation.tabs.sticky
@@ -38,6 +39,26 @@ theme:
 
 plugins:
   - search:
+      lang: [en, it]
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: true
+      languages:
+        - locale: en
+          default: true
+          name: English
+          
+        - locale: it
+          name: Italiano
+          
+
+extra:
+  alternate:
+    - name: English
+      link: /portfolio/
+      lang: en
+    - name: Italiano
+      link: /portfolio/it/
       lang: it
 
 markdown_extensions:
@@ -62,4 +83,5 @@ nav:
     - AD Infrastructure - DarkZero: darkzero.md
     - Kerberos & SQL - Signed: signed.md
   - ⚙️ Projects:
-    - Boot2Root Design - Waifu Gallery: eth.md
+    - LazyPwn CTF Orchestrator: lazypwn.md
+    - Boot2Root Design - Anime Gallery: eth.md

