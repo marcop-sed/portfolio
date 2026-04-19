@@ -1,6 +1,6 @@
 # LazyPwn v1.0 – Asynchronous CTF Orchestrator
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue) ![Kali](https://img.shields.io/badge/OS-Kali%20Linux-black) ![Asyncio](https://img.shields.io/badge/Arch-Async%20Event--Driven-success)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue) ![Kali](https://img.shields.io/badge/OS-Kali%20Linux-black) ![Asyncio](https://img.shields.io/badge/Arch-Async%20Event--Driven-success) [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/marcop-sed/lazypwn) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/marcop-sed/lazypwn/blob/main/LICENSE)
 
 > *"I choose a lazy person to do a hard job. Because a lazy person will find an easy way to do it."* — Bill Gates (probabilmente parlando di CTF)
 
@@ -91,4 +91,10 @@ Le connessioni VPN esplodono sempre nei CTF. LazyPwn usa un **JSON State Manager
     - **Auto-Chown:** Hai presente l'ansia di farti dumpare nmap report protetti da `root` che poi per leggerli o cancellarli devi fare il `sudo chown` ovunque? Finito. LazyPwn fa hook di se stesso a fine pipeline e ti ridà i permessi utente ai file. 
     - **Webhooks:** Scansione finita. Script in background ti passa il bot di Slack o Discord con le info, porte, e loot trovato via message sul tuo canale privato.
     - **Interactive HTML Report:** Tutto quello che dumpato, convertito via generator e sputato sul tuo hard disk come HTML per potersi leggere senza gli occhi da terminale.
+
+---
+
+## 💻 Codice Sorgente & Open Source
+
+LazyPwn è un progetto interamente open source rilasciato sotto licenza **GNU GPL v3**. Tutto il codice sorgente, l'architettura asincrona e i vari moduli sono disponibili pubblicamente. Se vuoi spulciare il codice, fare una pull request o semplicemente usarlo per la tua prossima CTF, trovi tutto qui: **[Visita la repository su GitHub](https://github.com/marcop-sed/lazypwn)**.
 

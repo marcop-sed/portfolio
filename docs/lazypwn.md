@@ -1,6 +1,6 @@
 # LazyPwn v1.0 – Asynchronous CTF Orchestrator
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue) ![Kali](https://img.shields.io/badge/OS-Kali%20Linux-black) ![Asyncio](https://img.shields.io/badge/Arch-Async%20Event--Driven-success)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue) ![Kali](https://img.shields.io/badge/OS-Kali%20Linux-black) ![Asyncio](https://img.shields.io/badge/Arch-Async%20Event--Driven-success) [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/marcop-sed/lazypwn) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/marcop-sed/lazypwn/blob/main/LICENSE)
 
 > *"I choose a lazy person to do a hard job. Because a lazy person will find an easy way to do it."* — Bill Gates (probably talking about CTFs)
 
@@ -91,4 +91,10 @@ Anyone playing CTFs knows that VPN connections can drop unexpectedly. To solve t
     - **Auto-Chown:** Ever hate getting `Permission Denied` because Nmap `sudo` scans created folders owned by root? LazyPwn intercepts the process and chowns the generated loot/folders back to your user account automatically.
     - **Webhooks:** A completed run doesn't just stop. It pushes the extracted loot directly to your Discord or Slack channel via webhooks.
     - **Interactive HTML Report:** At the end of the pipeline, it compiles a slick, responsive HTML summary so you can easily review the attack surface.
+
+---
+
+## 💻 Source Code & Open Source
+
+LazyPwn is a fully open-source project released under the **GNU GPL v3** license. All the source code, the async architecture, and the specific modules are publicly available. Whether you want to dig into the code, submit a PR, or just use it for your next CTF, you can find it all here: **[Check out the repository on GitHub](https://github.com/marcop-sed/lazypwn)**.
 
