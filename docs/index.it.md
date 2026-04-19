@@ -28,7 +28,7 @@ Nel penetration testing il 50% è trovare la vulnerabilità. L'altro 50%? Comuni
 
 ### ⚙️ **Projects**
 
-- **[LazyPwn – Asynchronous CTF Orchestrator](lazypwn.md)** – Un framework asincrono e ad eventi scritto in Python 3, progettato per automatizzare la fase di ricognizione durante le CTF. Ottimizza i tempi di scanning, gestisce i crash di rete tramite design stateful e fornisce routine di supporto per il post-exploitation.
+- **[LazyPwn v1.0 – Asynchronous CTF Orchestrator](lazypwn.md)** – Un framework in Python 3 che si è evoluto da semplice script di recon a un vero e proprio orchestratore asincrono "zero sbatti". Supporta Context-Aware Web Fuzzing (rilvamento SPA e WAF evasion), In-Memory Secret Hunting (estrazione JWT e chiavi AWS dai sorgenti JS scaricati al volo), OSINT via crt.sh e Auto-Breaching via cred-spraying SSH/SMB se sniffa password. In post-exploitation piove un arsenale pronto (script per Chisel, shell ELF via MSFvenom) e ti rifila un comodo report interattivo in HTML e via Webhook.
 
 - **[Anime-themed gallery – Boot2Root Design](eth.md)** – Progettazione di una VM Ubuntu Server che ospitasse una web app vulnerabile controllata per scopo didattico. 6 vulnerabilità, 3 livelli di difficoltà, exploit chain progressiva.
 
@@ -53,3 +53,5 @@ It's dangerous to go alone. Take this. 🍺
 ---
 
 **Disclaimer:** I report sono sanitizzati – niente credenziali reali, niente IP pubblici compromessi. Tutti i dati provengono da lab isolate (HackTheBox, HTB Season 9, custom VMs).
+
+---
