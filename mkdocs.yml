@@ -55,10 +55,10 @@ plugins:
 extra:
   alternate:
     - name: English
-      link: /portfolio/
+      link: /portfolio/en/
       lang: en
     - name: Italiano
-      link: /portfolio/it/
+      link: /portfolio/
       lang: it
 
 markdown_extensions:
