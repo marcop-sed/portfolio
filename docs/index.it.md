@@ -1,12 +1,18 @@
 # Offensive Security & Engineering Portfolio
 
-Ciao. Sono un Cyber Engineer, o almeno così mi hanno scritto. Ogni tanto sviluppo roba e faccio esercizi di pentest facendo pratica poi sulla parte di reportistica, visto che per le aziende è importante da quanto ho capito.
+Sono un Cyber Engineer con conoscenze orizzontali con l'obbiettivo di verticalizzarsi maggiormente su DevSecOps e Offensive Security. Ho creato questo portfolio per tenere traccia dei miei lavori.
 
-Qui troverai una raccolta di **assessment simulati** su scenari realistici: AD compromise via MS-SQL, certificate-based escalation, web application injection, cryptographic exploitation. Non sono ingaggi reali (for legal reasons 🙃), ma rendono bene l'idea.
+Attualmente, il menù offre:
 
-## Perché questo modo di fare reportistica?
+- **Assessment simulati**: Report in stile professionale su scenari di HackTheBox, utilizzati per apprendere le metologie e prendere familiarità con gli standard utilizzati. AD compromise via MS-SQL, certificate-based escalation, web application injection, sono alcuni esempi di quello che è stato affrontato. Non sono ingaggi reali (for legal reasons 🙃), ma rendono bene l'idea e sono utili allo scopo.
 
-Nel penetration testing il 50% è trovare la vulnerabilità. L'altro 50%? Comunicare il danno agli stakeholder, che non è sempre detto capiscano il tecnichese. **Quindi report non=POC tecnico, ma narrativa + findings + remediation** che i team infrastrutturali possono effettivamente attuare. Avrei anche fatto una tesi al riguardo per automatizzare ciò, ma non la pubblico che altrimenti me la fregano; ovviamente se vi interessa ve la giro, ma non si sa mai.
+- **Progetti personali**: Progetti di sviluppo sia in ambito cybersecurity che non. La maggior parte di questi nascono da delle esigenze, per semplificare ed automatizzare processi.
+
+
+
+### Perché fare Report su macchine di HTB
+
+Stavo partecipando alla Season 9 di HackTheBox per imparare e sperimentare tecniche di Penetration Testing; in seguito, mi è stato detto che potevano essere un'ottima simulazione per approfondire le tecniche di reportistica, apprendendo le metodologie relative ai framework NIST 800-115, OSSTMM e PTES. 
 
 ---
 
@@ -26,11 +32,32 @@ Nel penetration testing il 50% è trovare la vulnerabilità. L'altro 50%? Comuni
 - **[Scenario "Signed"](signed.md)** – Kerberos Abuse & MS-SQL (PTES)  
   DB esposto → SMB auth coercion → NTLM hash extraction → Silver Ticket forging via PAC manipulation. Due stage di ticket, due livelli di escalation. CVSS 9.8.
 
-### ⚙️ **Projects**
 
-- **[LazyPwn v1.0 – Asynchronous CTF Orchestrator](lazypwn.md)** | [🐙 GitHub Repo](https://github.com/marcop-sed/lazypwn) – Un framework in Python 3 che si è evoluto da semplice script di recon a un vero e proprio orchestratore asincrono "zero sbatti". Supporta Context-Aware Web Fuzzing (rilvamento SPA e WAF evasion), In-Memory Secret Hunting (estrazione JWT e chiavi AWS dai sorgenti JS scaricati al volo), OSINT via crt.sh e Auto-Breaching via cred-spraying SSH/SMB se sniffa password. In post-exploitation piove un arsenale pronto (script per Chisel, shell ELF via MSFvenom) e ti rifila un comodo report interattivo in HTML e via Webhook.
+## ⚙️ **Projects**
 
-- **[Anime-themed gallery – Boot2Root Design](eth.md)** – Progettazione di una VM Ubuntu Server che ospitasse una web app vulnerabile controllata per scopo didattico. 6 vulnerabilità, 3 livelli di difficoltà, exploit chain progressiva.
+### **Cybersecurity**
+
+- **NERVA: Nexus for Enterprise Risk and Vulnerability Assessment** - *Master's Thesis Project*  
+  NERVA nasce a seguito di un tirocinio in ambito Purple Team per ricerca. L'idea è stata quella di creare un tool che prendesse in input un report del Red Team e, tramite un motore di correlazione che si aggancia ad un LLM, mappare le vulnerabilità sul framework NIST CSF 2.0 e sulla matrice del MITRE ATT&CK; utilizzando quest'ultimo, si identifica la rispettiva remediation proposta dal D3FEND e si propone una patch applicabile, ottenuta e rifinita da un sistema di learning interno che apprende dai feedback ottenuti tramite un processo human-in-the-loop.  
+  Architettura disponibile su richiesta durante un eventuale iter di selezione.
+
+- **[LazyPwn – Asynchronous CTF Orchestrator](lazypwn.md)** | [🐙 GitHub Repo](https://github.com/marcop-sed/lazypwn)  
+  Nasce come un supporto nato durante la Season 9 di HTB per automatizzare i classici comandi dei reconnaissance, poi man mano ampliato. Supporta Context-Aware Web Fuzzing (rilevamento SPA e WAF evasion), In-Memory Secret Hunting (estrazione JWT e chiavi AWS dai sorgenti JS scaricati al volo), OSINT via crt.sh e Auto-Breaching via cred-spraying SSH/SMB se sniffa password. In post-exploitation piove un arsenale pronto (script per Chisel, shell ELF via MSFvenom) e ti rifila un comodo report interattivo in HTML e via Webhook. Non è stato testato al di fuori di quegli scenari.
+
+- **[Anime-themed gallery – Boot2Root Design](eth.md)**  
+  Progettazione di una VM Ubuntu Server che ospitasse una web app vulnerabile controllata per scopo didattico. 
+  6 vulnerabilità, 3 livelli di difficoltà, exploit chain progressiva.
+
+
+### **Development**
+ 
+- **Geostment** - *(in progress)*  
+  Un software dedicato all'analisi di pacchetti ETF per bilanciare la distribuzione degli investimenti in base ad ambito e Stato, per ottimizzare l'investimento ottenendo la massima omogeneità.
+
+- **Game-Engine JS Plugin**  
+  Plugin per estendere funzionalità di un motore di sviluppo di gioco.
+
+ 
 
 ---
 
