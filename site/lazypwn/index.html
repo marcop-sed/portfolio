@@ -714,10 +714,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-post-exploitation-arsenal" class="md-nav__link">
+  <a href="#5-post-exploitation-module-arsenal" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Post-Exploitation Arsenal
+        5. Post-Exploitation Module (Arsenal)
       
     </span>
   </a>
@@ -725,10 +725,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-state-management-quality-of-life" class="md-nav__link">
+  <a href="#6-state-management-and-quality-of-life" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. State Management &amp; Quality of Life
+        6. State Management and Quality of Life
       
     </span>
   </a>
@@ -878,10 +878,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-post-exploitation-arsenal" class="md-nav__link">
+  <a href="#5-post-exploitation-module-arsenal" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Post-Exploitation Arsenal
+        5. Post-Exploitation Module (Arsenal)
       
     </span>
   </a>
@@ -889,10 +889,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-state-management-quality-of-life" class="md-nav__link">
+  <a href="#6-state-management-and-quality-of-life" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. State Management &amp; Quality of Life
+        6. State Management and Quality of Life
       
     </span>
   </a>
@@ -930,18 +930,18 @@
 <h1 id="lazypwn-v10-asynchronous-ctf-orchestrator">LazyPwn v1.0 – Asynchronous CTF Orchestrator<a class="headerlink" href="#lazypwn-v10-asynchronous-ctf-orchestrator" title="Permanent link">&para;</a></h1>
 <p><img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-blue" /> <img alt="Kali" src="https://img.shields.io/badge/OS-Kali%20Linux-black" /> <img alt="Asyncio" src="https://img.shields.io/badge/Arch-Async%20Event--Driven-success" /> <a href="https://github.com/marcop-sed/lazypwn"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-Repository-181717?logo=github" /></a> <a href="https://github.com/marcop-sed/lazypwn/blob/main/LICENSE"><img alt="License: GPL v3" src="https://img.shields.io/badge/License-GPLv3-blue.svg" /></a></p>
 <blockquote>
-<p><em>"I choose a lazy person to do a hard job. Because a lazy person will find an easy way to do it."</em> — Bill Gates (probably talking about CTFs)</p>
+<p><em>"I choose a lazy person to do a hard job. Because a lazy person will find an easy way to do it."</em> - Bill Gates</p>
 </blockquote>
 <h2 id="1-executive-summary">1. Executive Summary<a class="headerlink" href="#1-executive-summary" title="Permanent link">&para;</a></h2>
-<p>LazyPwn v1.0 stems from a practical need encountered during Hack The Box sessions and similar CTF environments: automating the initial reconnaissance phase and delegating repetitive tasks to the machine. You should not have to be a monkey typing the same commands over and over.</p>
-<p>Originally a basic wrapper script, LazyPwn has rapidly mutated into a <strong>Context-Aware, asynchronous event-driven orchestrator</strong> written in Python 3.10+. It doesn't just do enumeration—it recognizes tech stacks in real-time, extracts in-memory secrets from JavaScript files, evades WAFs, and actively attempts Auto-Breaching via Credential Spraying if it sniffs a valid credential. The goal is to lay all the prep work, handle the annoying enumerations, and dump a ready-to-use arsenal in your lap, leaving you actual time to focus on the proper exploit logic instead of manual drudgery.</p>
+<p>LazyPwn stems from a practical need encountered during Hack The Box sessions and CTF environments: automating the initial reconnaissance phase and delegating repetitive tasks. Playing the typing monkey by repeatedly copying the same 15 nmap commands is not fun, and risking having to redo it because of a syntax error is even worse.</p>
+<p>The idea was to be a wrapper script to streamline the initial phase, but step by step I added elements. It doesn't just do enumeration but recognizes tech stacks, analyzes JavaScript looking for hardcoded sensitive data, bypasses WAFs through dynamic throttling, and actively attempts Auto-Breaching via Credential Spraying if it sniffs a valid credential. The goal is to have it prep the whole ground and direct you correctly during the initial phase.</p>
 <hr />
 <h2 id="2-architecture-and-workflow">2. Architecture and Workflow<a class="headerlink" href="#2-architecture-and-workflow" title="Permanent link">&para;</a></h2>
-<p>The project relies on an <code>asyncio</code> core designed to drastically cut down idle waiting times. The pipeline has gotten significantly smarter and more paranoid.</p>
+<p>The project relies on an <code>asyncio</code> core designed to optimize times following a logical pipeline.</p>
 <ul>
-<li><strong>Blazing Fast Pipeline:</strong> The initial port discovery leverages <code>rustscan</code> for almost instantaneous detection. Results are piped directly into <code>nmap</code> for deep service identification, skipping the usual endless <code>-p-</code> scans.</li>
-<li><strong>Context-Aware Fuzzing and WAF Evasion:</strong> LazyPwn parses HTTP headers and responses to detect Single Page Applications (SPA) built with React, Vue, or Node.js. It automatically toggles dynamic throttling and User-Agent rotation if it detects a WAF kicking it to the curb. Oh, and it uses crt.sh to perform OSINT to unearth forgotten VHOSTs and API subdomains.</li>
-<li><strong>Smart Service Router:</strong> Depending on the discovered open ports, it autonomously triggers specific parallel modules in the background.</li>
+<li><strong>Blazing Fast Pipeline:</strong> The initial discovery phase leverages <code>rustscan</code> for lightning-fast port detection. The results pipe straight into <code>nmap</code> for deep service identification, eliminating the need for the <code>-p-</code> parameter.</li>
+<li><strong>Context-Aware Fuzzing &amp; WAF Evasion:</strong> LazyPwn parses headers and HTTP responses to recognize Single Page Applications (React, Vue, Node). If it sniffs that a WAF is blocking it, it automatically activates dynamic throttling and User-Agent rotation. It also attempts to do OSINT via crt.sh to unearth hidden VHOSTs or API subdomains.</li>
+<li><strong>Smart Service Router:</strong> Depending on the discovered ports, it launches parallel modules in the background autonomously.</li>
 </ul>
 <h3 id="execution-pipeline">Execution Pipeline<a class="headerlink" href="#execution-pipeline" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>graph TD
@@ -968,37 +968,36 @@
 </code></pre></div>
 <hr />
 <h2 id="3-the-secret-hunter-auto-dumper">3. The Secret Hunter &amp; Auto-Dumper<a class="headerlink" href="#3-the-secret-hunter-auto-dumper" title="Permanent link">&para;</a></h2>
-<p>It's 2026. Hardcoded secrets are still being pushed to production JavaScript bundles. I got tired of manually checking Developer Tools, so I automated the whole thing.</p>
-<p>LazyPwn no longer just logs "Hey, I found an endpoint". The <strong>Auto-Dumper</strong> dynamically pulls <code>.env</code> files, attempts to recursively dump exposed <code>.git</code> directories, and grabs OpenAPI/Swagger documentation. But the real jewel of the crown is the <strong>Secret Hunter</strong>: it fetches every single loaded <code>.js</code> file, holds it in memory, parses the minified chunks, and rips out JWTs, AWS Access Keys, and API tokens on the fly using heavy Regex. </p>
-<p>!!! info "Zero Effort Required"
-    If there is a hardcoded "Administrator" token buried inside <code>app.bundle.44.chunk.js</code>, LazyPwn will extract it and drop it directly into your lap without you ever having to open a browser.</p>
+<p>Since analyzing JavaScripts (with <code>wget</code> or developer tools) took too much time and there's a risk of glossing over data that might not catch the eye, automating this scraping is therefore more effective as well as efficient.</p>
+<p>The <strong>Auto-Dumper</strong> actively pulls down <code>.env</code> files, magically exports entire <code>.git</code> roots if discovered, and steals OpenAPI/Swagger docs locally. Furthermore, the <strong>Secret Hunter</strong> pulls down <em>all</em> the <code>.js</code> linked in the page, throws them in memory, parses them (even if minified) and extracts via <em>regex</em> JWTs, AWS keys and API Tokens on the fly (obviously if found).</p>
+<p><em>"Zero Sbatti"</em>:
+    If there is an "Administrator" token dumped at line 12,000 of <code>app.bundle.44.chunk.js</code>, LazyPwn extracts it and prints it on screen without you ever having to open a browser.</p>
 <hr />
 <h2 id="4-auto-breach-weaponization">4. Auto-Breach (Weaponization)<a class="headerlink" href="#4-auto-breach-weaponization" title="Permanent link">&para;</a></h2>
-<p>Why stop at finding credentials if we have access to the services where they belong? Because doing copy-paste from <code>secrets.txt</code> to SSH login prompts was too much work, I implemented <strong>Auto-Breaching</strong>.</p>
-<p>When LazyPwn identifies passwords, JWTs, or raw NTLM pieces during its run, it silently queues up a parallel credential spraying attack against discovered SSH and SMB services using tools like <code>netexec</code>. If it hooks a valid session, it secures the persistent access automatically. You essentially wake up to an already breached system.</p>
+<p>Why limit ourselves to logging the found credentials if we have access to SSH or SMB? Since repeatedly copy-pasting from <code>secrets.txt</code> into login prompts was tedious, I implemented <strong>Auto-Breaching</strong>.</p>
+<p>When LazyPwn hits a password, a valid JWT, various tokens, or raw NTLM during its scans, it silently queues a parallel task and launches a Credential Spraying attack using tools like <code>netexec</code> against the valid services found. If it catches the session, you find the access saved and you saved time and effort.</p>
 <hr />
-<h2 id="5-post-exploitation-arsenal">5. Post-Exploitation Arsenal<a class="headerlink" href="#5-post-exploitation-arsenal" title="Permanent link">&para;</a></h2>
-<p>Once initial access to a target is achieved, stabilizing the reverse shell and prepping escalation binaries is always the very next step (and usually the most boring one to type). By adding the <code>--shell</code> flag, you turn LazyPwn into a <strong>Post-Exploitation Buddy</strong>.</p>
-<p>!!! warning "It's dangerous to go alone!"
-    When you get a "dumb" shell via a web exploit, lose your command history, hit <code>Ctrl+C</code> heedlessly, and accidentally kill your own session... it is literally time to use the shell mode.</p>
+<h2 id="5-post-exploitation-module-arsenal">5. Post-Exploitation Module (Arsenal)<a class="headerlink" href="#5-post-exploitation-module-arsenal" title="Permanent link">&para;</a></h2>
+<p>Once initial access to the machine is obtained, stabilizing the damn reverse shell and transferring binaries for escalation is always the immediately next step (as well as the most annoying). By throwing a nice <code>--shell</code> flag, LazyPwn turns into your <strong>Post-Exploitation Buddy</strong>.</p>
+<p><em>"It's dangerous to go alone!"</em>
+When you get a "dumb" shell via a web exploit, lose the command history, accidentally press <code>Ctrl+C</code> and kill your own magic shell forcing you to redo everything from scratch... it is literally time to use the shell module.</p>
 <ol>
-<li><strong>Auto-Discovery:</strong> Automatically detects the local IP address assigned to the VPN interface (<code>tun0</code>).</li>
-<li><strong>Payload Staging:</strong> Starts a local Python HTTP server temporarily hosting a local <code>tools/</code> directory.</li>
-<li><strong>Weapon Forging:</strong> Dynamically runs <code>msfvenom</code> to compile ELF C reverse shells tailored to your IP. It even generates PHP/ASPX web shells on the fly.</li>
-<li><strong>Pivoting Automator:</strong> Drops the exact bash commands to set up a Chisel proxy back to your machine. </li>
-<li><strong>TTY Escaping:</strong> Displays copy-paste ready command blocks to escape the "dumb shell" environment (the infamous <code>python3 -c 'import pty...; pty.spawn("/bin/bash")'</code> chunk, coupled with the magic <code>stty raw -echo</code> configs).</li>
+<li><strong>Auto-Discovery:</strong> Automatically detects the local IP of your VPN interface (<code>tun0</code>).</li>
+<li><strong>Payload Staging:</strong> Spins up a Python HTTP server to host your <code>/tools</code> folder for stuff like LinPEAS/winPEAS.</li>
+<li><strong>Weapon Forging:</strong> Dynamically launches <code>msfvenom</code> to spit out pre-configured ELF (C) reverse shells on your IP, or PHP/ASPX web shells generating them on the fly.</li>
+<li><strong>Pivoting Automator:</strong> Generates the perfect copy-pasteable bash syntax to make the Chisel tunnel back to your machine without typos.</li>
+<li><strong>TTY Escaping:</strong> Prints the famous block chain <code>python3 -c 'import pty...; pty.spawn("/bin/bash")'</code> followed by <code>stty raw -echo</code> so you literally just do two clicks.</li>
 </ol>
 <hr />
-<h2 id="6-state-management-quality-of-life">6. State Management &amp; Quality of Life<a class="headerlink" href="#6-state-management-quality-of-life" title="Permanent link">&para;</a></h2>
-<p>Anyone playing CTFs knows that VPN connections can drop unexpectedly. To solve the issue of having to start long recon phases from scratch, LazyPwn implements a JSON-based <strong>State Manager</strong> (<code>state.json</code>). It remembers exactly what it already scanned.</p>
-<p>!!! tip "Quality of Life Improvements"
-    LazyPwn v1.0 also pushes heavy QoL features:
-    - <strong>Auto-Chown:</strong> Ever hate getting <code>Permission Denied</code> because Nmap <code>sudo</code> scans created folders owned by root? LazyPwn intercepts the process and chowns the generated loot/folders back to your user account automatically.
-    - <strong>Webhooks:</strong> A completed run doesn't just stop. It pushes the extracted loot directly to your Discord or Slack channel via webhooks.
-    - <strong>Interactive HTML Report:</strong> At the end of the pipeline, it compiles a slick, responsive HTML summary so you can easily review the attack surface.</p>
+<h2 id="6-state-management-and-quality-of-life">6. State Management and Quality of Life<a class="headerlink" href="#6-state-management-and-quality-of-life" title="Permanent link">&para;</a></h2>
+<p>VPN connections always explode during CTFs; to remedy this, a <strong>JSON State Manager</strong> (<code>state.json</code>) is used, keeping in memory what or which scripts are completed.</p>
+<p><em>QoL - (Quality of Life)</em>
+    - <strong>Auto-Chown:</strong> You know the anxiety of having nmap reports dumped protected by <code>root</code> and then to read or delete them you have to do <code>sudo chown</code> everywhere? Gone. LazyPwn hooks itself at the end of the pipeline and gives you back user permissions to the files.
+    - <strong>Webhooks:</strong> Scan finished? A background script passes you the Slack or Discord bot with the info, ports, and loot found via message on your private channel.
+    - <strong>Interactive HTML Report:</strong> Everything that has been dumped is converted via generator into HTML for a better read.</p>
 <hr />
 <h2 id="source-code-open-source">💻 Source Code &amp; Open Source<a class="headerlink" href="#source-code-open-source" title="Permanent link">&para;</a></h2>
-<p>LazyPwn is a fully open-source project released under the <strong>GNU GPL v3</strong> license. All the source code, the async architecture, and the specific modules are publicly available. Whether you want to dig into the code, submit a PR, or just use it for your next CTF, you can find it all here: <strong><a href="https://github.com/marcop-sed/lazypwn">Check out the repository on GitHub</a></strong>.</p>
+<p>LazyPwn is a fully open-source project released under the <strong>GNU GPL v3</strong> license. All the source code, the architecture, and the various modules are publicly available. If you want to dig into the code, make a pull request or simply use it for your next CTF, you find everything here: <strong><a href="https://github.com/marcop-sed/lazypwn">Visit the repository on GitHub</a></strong>.</p>
 
 
 

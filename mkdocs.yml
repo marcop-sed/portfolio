@@ -44,12 +44,12 @@ plugins:
       docs_structure: suffix
       fallback_to_default: true
       languages:
-        - locale: en
-          default: true
-          name: English
-          
         - locale: it
+          default: true
           name: Italiano
+          
+        - locale: en
+          name: English
           
 
 extra:

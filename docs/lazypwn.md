@@ -1,10 +1,10 @@
-# LazyPwn v1.0 – Asynchronous CTF Orchestrator
+# LazyPwn – Your CTF Buddy
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue) ![Kali](https://img.shields.io/badge/OS-Kali%20Linux-black) ![Asyncio](https://img.shields.io/badge/Arch-Async%20Event--Driven-success) [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/marcop-sed/lazypwn) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/marcop-sed/lazypwn/blob/main/LICENSE)
 
 > *"I choose a lazy person to do a hard job. Because a lazy person will find an easy way to do it."* - Bill Gates
 
-## 1. Executive Summary
+## 1. Summary
 
 LazyPwn stems from a practical need encountered during Hack The Box sessions and CTF environments: automating the initial reconnaissance phase and delegating repetitive tasks. Playing the typing monkey by repeatedly copying the same 15 nmap commands is not fun, and risking having to redo it because of a syntax error is even worse.
 

@@ -400,10 +400,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#perche-questo-modo-di-fare-reportistica" class="md-nav__link">
+  <a href="#perche-fare-report-su-macchine-di-htb" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Perché questo modo di fare reportistica?
+        Perché fare Report su macchine di HTB
       
     </span>
   </a>
@@ -433,11 +433,39 @@
   
 </li>
         
-          <li class="md-nav__item">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#projects" class="md-nav__link">
     <span class="md-ellipsis">
       
         ⚙️ Projects
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="⚙️ Projects">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cybersecurity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cybersecurity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development
       
     </span>
   </a>
@@ -788,10 +816,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#perche-questo-modo-di-fare-reportistica" class="md-nav__link">
+  <a href="#perche-fare-report-su-macchine-di-htb" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Perché questo modo di fare reportistica?
+        Perché fare Report su macchine di HTB
       
     </span>
   </a>
@@ -821,11 +849,39 @@
   
 </li>
         
-          <li class="md-nav__item">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#projects" class="md-nav__link">
     <span class="md-ellipsis">
       
         ⚙️ Projects
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="⚙️ Projects">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cybersecurity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cybersecurity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development
       
     </span>
   </a>
@@ -877,10 +933,18 @@
 
 
 <h1 id="offensive-security-engineering-portfolio">Offensive Security &amp; Engineering Portfolio<a class="headerlink" href="#offensive-security-engineering-portfolio" title="Permanent link">&para;</a></h1>
-<p>Ciao. Sono un Cyber Engineer, o almeno così mi hanno scritto. Ogni tanto sviluppo roba e faccio esercizi di pentest facendo pratica poi sulla parte di reportistica, visto che per le aziende è importante da quanto ho capito.</p>
-<p>Qui troverai una raccolta di <strong>assessment simulati</strong> su scenari realistici: AD compromise via MS-SQL, certificate-based escalation, web application injection, cryptographic exploitation. Non sono ingaggi reali (for legal reasons 🙃), ma rendono bene l'idea.</p>
-<h2 id="perche-questo-modo-di-fare-reportistica">Perché questo modo di fare reportistica?<a class="headerlink" href="#perche-questo-modo-di-fare-reportistica" title="Permanent link">&para;</a></h2>
-<p>Nel penetration testing il 50% è trovare la vulnerabilità. L'altro 50%? Comunicare il danno agli stakeholder, che non è sempre detto capiscano il tecnichese. <strong>Quindi report non=POC tecnico, ma narrativa + findings + remediation</strong> che i team infrastrutturali possono effettivamente attuare. Avrei anche fatto una tesi al riguardo per automatizzare ciò, ma non la pubblico che altrimenti me la fregano; ovviamente se vi interessa ve la giro, ma non si sa mai.</p>
+<p>Sono un Cyber Engineer con conoscenze orizzontali con l'obbiettivo di verticalizzarsi maggiormente su DevSecOps e Offensive Security. Ho creato questo portfolio per tenere traccia dei miei lavori.</p>
+<p>Attualmente, il menù offre:</p>
+<ul>
+<li>
+<p><strong>Assessment simulati</strong>: Report in stile professionale su scenari di HackTheBox, utilizzati per apprendere le metologie e prendere familiarità con gli standard utilizzati. AD compromise via MS-SQL, certificate-based escalation, web application injection, sono alcuni esempi di quello che è stato affrontato. Non sono ingaggi reali (for legal reasons 🙃), ma rendono bene l'idea e sono utili allo scopo.</p>
+</li>
+<li>
+<p><strong>Progetti personali</strong>: Progetti di sviluppo sia in ambito cybersecurity che non. La maggior parte di questi nascono da delle esigenze, per semplificare ed automatizzare processi.</p>
+</li>
+</ul>
+<h3 id="perche-fare-report-su-macchine-di-htb">Perché fare Report su macchine di HTB<a class="headerlink" href="#perche-fare-report-su-macchine-di-htb" title="Permanent link">&para;</a></h3>
+<p>Stavo partecipando alla Season 9 di HackTheBox per imparare e sperimentare tecniche di Penetration Testing; in seguito, mi è stato detto che potevano essere un'ottima simulazione per approfondire le tecniche di reportistica, apprendendo le metodologie relative ai framework NIST 800-115, OSSTMM e PTES. </p>
 <hr />
 <h2 id="i-report">I Report<a class="headerlink" href="#i-report" title="Permanent link">&para;</a></h2>
 <h3 id="offensive-security-assessments">🔴 <strong>Offensive Security Assessments</strong><a class="headerlink" href="#offensive-security-assessments" title="Permanent link">&para;</a></h3>
@@ -902,13 +966,33 @@
   DB esposto → SMB auth coercion → NTLM hash extraction → Silver Ticket forging via PAC manipulation. Due stage di ticket, due livelli di escalation. CVSS 9.8.</p>
 </li>
 </ul>
-<h3 id="projects">⚙️ <strong>Projects</strong><a class="headerlink" href="#projects" title="Permanent link">&para;</a></h3>
+<h2 id="projects">⚙️ <strong>Projects</strong><a class="headerlink" href="#projects" title="Permanent link">&para;</a></h2>
+<h3 id="cybersecurity"><strong>Cybersecurity</strong><a class="headerlink" href="#cybersecurity" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
-<p><strong><a href="lazypwn/">LazyPwn v1.0 – Asynchronous CTF Orchestrator</a></strong> | <a href="https://github.com/marcop-sed/lazypwn">🐙 GitHub Repo</a> – Un framework in Python 3 che si è evoluto da semplice script di recon a un vero e proprio orchestratore asincrono "zero sbatti". Supporta Context-Aware Web Fuzzing (rilvamento SPA e WAF evasion), In-Memory Secret Hunting (estrazione JWT e chiavi AWS dai sorgenti JS scaricati al volo), OSINT via crt.sh e Auto-Breaching via cred-spraying SSH/SMB se sniffa password. In post-exploitation piove un arsenale pronto (script per Chisel, shell ELF via MSFvenom) e ti rifila un comodo report interattivo in HTML e via Webhook.</p>
+<p><strong>NERVA: Nexus for Enterprise Risk and Vulnerability Assessment</strong> - <em>Master's Thesis Project</em><br />
+  NERVA nasce a seguito di un tirocinio in ambito Purple Team per ricerca. L'idea è stata quella di creare un tool che prendesse in input un report del Red Team e, tramite un motore di correlazione che si aggancia ad un LLM, mappare le vulnerabilità sul framework NIST CSF 2.0 e sulla matrice del MITRE ATT&CK; utilizzando quest'ultimo, si identifica la rispettiva remediation proposta dal D3FEND e si propone una patch applicabile, ottenuta e rifinita da un sistema di learning interno che apprende dai feedback ottenuti tramite un processo human-in-the-loop.<br />
+  Architettura disponibile su richiesta durante un eventuale iter di selezione.</p>
 </li>
 <li>
-<p><strong><a href="eth/">Anime-themed gallery – Boot2Root Design</a></strong> – Progettazione di una VM Ubuntu Server che ospitasse una web app vulnerabile controllata per scopo didattico. 6 vulnerabilità, 3 livelli di difficoltà, exploit chain progressiva.</p>
+<p><strong><a href="lazypwn/">LazyPwn – Asynchronous CTF Orchestrator</a></strong> | <a href="https://github.com/marcop-sed/lazypwn">🐙 GitHub Repo</a><br />
+  Nasce come un supporto nato durante la Season 9 di HTB per automatizzare i classici comandi dei reconnaissance, poi man mano ampliato. Supporta Context-Aware Web Fuzzing (rilevamento SPA e WAF evasion), In-Memory Secret Hunting (estrazione JWT e chiavi AWS dai sorgenti JS scaricati al volo), OSINT via crt.sh e Auto-Breaching via cred-spraying SSH/SMB se sniffa password. In post-exploitation piove un arsenale pronto (script per Chisel, shell ELF via MSFvenom) e ti rifila un comodo report interattivo in HTML e via Webhook. Non è stato testato al di fuori di quegli scenari.</p>
+</li>
+<li>
+<p><strong><a href="eth/">Anime-themed gallery – Boot2Root Design</a></strong><br />
+  Progettazione di una VM Ubuntu Server che ospitasse una web app vulnerabile controllata per scopo didattico. 
+  6 vulnerabilità, 3 livelli di difficoltà, exploit chain progressiva.</p>
+</li>
+</ul>
+<h3 id="development"><strong>Development</strong><a class="headerlink" href="#development" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>Geostment</strong> - <em>(in progress)</em><br />
+  Un software dedicato all'analisi di pacchetti ETF per bilanciare la distribuzione degli investimenti in base ad ambito e Stato, per ottimizzare l'investimento ottenendo la massima omogeneità.</p>
+</li>
+<li>
+<p><strong>Game-Engine JS Plugin</strong><br />
+  Plugin per estendere funzionalità di un motore di sviluppo di gioco.</p>
 </li>
 </ul>
 <hr />

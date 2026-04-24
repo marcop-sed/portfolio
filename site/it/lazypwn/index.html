@@ -930,18 +930,18 @@
 <h1 id="lazypwn-v10-asynchronous-ctf-orchestrator">LazyPwn v1.0 – Asynchronous CTF Orchestrator<a class="headerlink" href="#lazypwn-v10-asynchronous-ctf-orchestrator" title="Permanent link">&para;</a></h1>
 <p><img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-blue" /> <img alt="Kali" src="https://img.shields.io/badge/OS-Kali%20Linux-black" /> <img alt="Asyncio" src="https://img.shields.io/badge/Arch-Async%20Event--Driven-success" /> <a href="https://github.com/marcop-sed/lazypwn"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-Repository-181717?logo=github" /></a> <a href="https://github.com/marcop-sed/lazypwn/blob/main/LICENSE"><img alt="License: GPL v3" src="https://img.shields.io/badge/License-GPLv3-blue.svg" /></a></p>
 <blockquote>
-<p><em>"I choose a lazy person to do a hard job. Because a lazy person will find an easy way to do it."</em> — Bill Gates (probabilmente parlando di CTF)</p>
+<p><em>"I choose a lazy person to do a hard job. Because a lazy person will find an easy way to do it."</em> - Bill Gates</p>
 </blockquote>
 <h2 id="1-executive-summary">1. Executive Summary<a class="headerlink" href="#1-executive-summary" title="Permanent link">&para;</a></h2>
-<p>LazyPwn v1.0 nasce da un'esigenza pratica incontrata durante le sessioni su Hack The Box e gli ambienti CTF: automatizzare la fase iniziale di ricognizione e delegare i task ripetitivi. Fare la scimmia dattilografa copiando sempre gli stessi 15 comandi nmap non è fare hacking.</p>
-<p>Da semplice script wrapper, LazyPwn è rapidamente mutato in un <strong>orchestratore asincrono "Context-Aware"</strong> basato ad eventi, scritto in Python 3.10+. Non fa solo pura enumerazione stupida: riconosce gli stack tecnologici in tempo reale, estrae segreti in memoria dai file JavaScript, bypassa i WAF tramite throttling dinamico e tenta attivamente l'Auto-Breaching via Credential Spraying se sniffa qualche credenziale valida. L'obiettivo è fargli preparare tutto il terreno, togliere di mezzo la noia, e fornirti un arsenale pronto all'uso, lasciandoti più tempo per focalizzarti sulla logica di exploit invece che farti digitare robe a mano.</p>
+<p>LazyPwn nasce da un'esigenza pratica incontrata durante le sessioni su Hack The Box e gli ambienti CTF: automatizzare la fase iniziale di ricognizione e delegare i task ripetitivi. Fare la scimmia dattilografa copiando sempre gli stessi 15 comandi nmap non è divertente, rischiare di doverlo rifare perché si è sbagliata la sintassi è pure peggio.</p>
+<p>L'idea era quello di essere uno script wrapper per snellire la fase iniziale, ma man mano ho aggiunto elementi. Non fa solo solo enumerazione ma riconosce gli stack tecnologici, analizza i JavaScript alla ricerca di dati sensibili hardcoded, bypassa i WAF tramite throttling dinamico e tenta attivamente l'Auto-Breaching via Credential Spraying se sniffa qualche credenziale valida. L'obiettivo è far preparare tutto il terreno ed indirizzare correttamente durante la fase iniziale.</p>
 <hr />
 <h2 id="2-architettura-e-workflow">2. Architettura e Workflow<a class="headerlink" href="#2-architettura-e-workflow" title="Permanent link">&para;</a></h2>
-<p>Il progetto si basa su un core <code>asyncio</code> progettato per ottimizzare brutalmente i tempi morti. La pipeline è diventata parecchio paranoica e intelligente.</p>
+<p>Il progetto si basa su un core <code>asyncio</code> progettato per ottimizzare i tempi seguendo una pipeline logica.</p>
 <ul>
-<li><strong>Blazing Fast Pipeline:</strong> La fase di discovery iniziale sfrutta <code>rustscan</code> per un rilevamento delle porte fulmineo. I risultati pipe-ano dritti dentro <code>nmap</code> per deep service identification, eliminando per sempre la noia del parametro <code>-p-</code>.</li>
-<li><strong>Context-Aware Fuzzing &amp; WAF Evasion:</strong> LazyPwn parsa gli header e le HTTP response per riconoscere le Single Page Applications (React, Vue, Node). Se fiuta che un WAF lo sta bloccando, attiva in automatico il throttling dinamico e la rotazione dello User-Agent. Ah, fa anche OSINT via crt.sh per sputare fuori VHOST nascosti o sottodomini API.</li>
-<li><strong>Smart Service Router:</strong> A seconda delle porte rilevate, lancia moduli paralleli in background autonomamente. Zero sbatti.</li>
+<li><strong>Blazing Fast Pipeline:</strong> La fase di discovery iniziale sfrutta <code>rustscan</code> per un rilevamento delle porte fulmineo. I risultati pipe-ano dritti dentro <code>nmap</code> per deep service identification, eliminando il bisogno del parametro <code>-p-</code>.</li>
+<li><strong>Context-Aware Fuzzing &amp; WAF Evasion:</strong> LazyPwn parsa gli header e le HTTP response per riconoscere le Single Page Applications (React, Vue, Node). Se fiuta che un WAF lo sta bloccando, attiva in automatico il throttling dinamico e la rotazione dello User-Agent. Tenta di fare anche OSINT via crt.sh per scovare VHOST nascosti o sottodomini API.</li>
+<li><strong>Smart Service Router:</strong> A seconda delle porte rilevate, lancia moduli paralleli in background autonomamente.</li>
 </ul>
 <h3 id="pipeline-di-esecuzione">Pipeline di Esecuzione<a class="headerlink" href="#pipeline-di-esecuzione" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>graph TD
@@ -968,37 +968,36 @@
 </code></pre></div>
 <hr />
 <h2 id="3-the-secret-hunter-auto-dumper">3. The Secret Hunter &amp; Auto-Dumper<a class="headerlink" href="#3-the-secret-hunter-auto-dumper" title="Permanent link">&para;</a></h2>
-<p>Siamo nel 2026. È incredibile ma la gente hardcoda ancora i token nei bundle JS in produzione. Mi ero troppo stancato di dover ispezionare tutta la roba nei Developer Tools, quindi ho automatizzato tutto.</p>
-<p>LazyPwn non ti dice più solo "Ehi, c'è una porta aperta". L'<strong>Auto-Dumper</strong> tira giù attivamente i file <code>.env</code>, esporta magicamente intere root <code>.git</code> se scoperte e si frega le docs OpenAPI/Swagger in locale. Ma il fiore all'occhiello è il <strong>Secret Hunter</strong>: tira giù <em>tutti</em> i <code>.js</code> linkati nella pagina, li butta in memoria, se li parsa (anche se minified) e tira fuori via Regex incazzate JWT, chiavi AWS e API Tokens al volo.</p>
-<p>!!! info "Zero Sbatti Required"
-    Se c'è un token "Administrator" dumpato alla riga 12.000 di <code>app.bundle.44.chunk.js</code>, LazyPwn lo estrae e te lo stampa a schermo senza che tu debba mai aprire un browser.</p>
+<p>Visto che analizzare i JavaScript (con <code>wget</code> o deveopers tool) richiedeva troppo tempo e si rischia di sorvolare su dati che magari non saltano all'occhio. Automatizzare questo scraping risulta quindi più efficace oltre che efficiente.</p>
+<p>L'<strong>Auto-Dumper</strong> tira giù attivamente i file <code>.env</code>, esporta magicamente intere root <code>.git</code> se scoperte e si frega le docs OpenAPI/Swagger in locale. Inoltre il <strong>Secret Hunter</strong> tira giù <em>tutti</em> i <code>.js</code> linkati nella pagina, li butta in memoria, se li parsa (anche se minified) e tira fuori via <em>regex</em> JWT, chiavi AWS e API Tokens al volo (ovviamente in caso trovate).</p>
+<p><em>"Zero Sbatti"</em>:<br />
+    Se c'è un token "Administrator" dumpato alla riga 12.000 di <code>app.bundle.44.chunk.js</code>, LazyPwn lo estrae e lo stampa a schermo senza che tu debba mai aprire un browser.</p>
 <hr />
 <h2 id="4-auto-breach-weaponization">4. Auto-Breach (Weaponization)<a class="headerlink" href="#4-auto-breach-weaponization" title="Permanent link">&para;</a></h2>
-<p>Perché limitarsi a loggare le credenziali trovate se abbiamo accesso a SSH o SMB? Dato che fare ripetutamente copia-incolla da <code>secrets.txt</code> nei prompt di login faceva troppa fatica, ho implementato l'<strong>Auto-Breaching</strong>.</p>
-<p>Quando LazyPwn becca una password, un JWT valido o roba NTLM grezza durante le sue scansioni, si accoda silenziosamente un task parallelo e lancia un attacco di Credential Spraying usando tool come <code>netexec</code> contro i servizi validi trovati. Se prende la sessione, ti ritrovi l'accesso salvato. Praticamente ti svegli con la macchina già bucata.</p>
+<p>Perché limitarsi a loggare le credenziali trovate se abbiamo accesso a SSH o SMB? Dato che fare ripetutamente copia-incolla da <code>secrets.txt</code> nei prompt di login era faticoso, ho implementato l'<strong>Auto-Breaching</strong>.</p>
+<p>Quando LazyPwn becca una password, un JWT valido, token vari o NTLM grezza durante le sue scansioni, si accoda silenziosamente un task parallelo e lancia un attacco di Credential Spraying usando tool come <code>netexec</code> contro i servizi validi trovati. Se prende la sessione, ti ritrovi l'accesso salvato ed hai risparmiato tempo e fatica.</p>
 <hr />
 <h2 id="5-modulo-di-post-exploitation-arsenal">5. Modulo di Post-Exploitation (Arsenal)<a class="headerlink" href="#5-modulo-di-post-exploitation-arsenal" title="Permanent link">&para;</a></h2>
 <p>Ottenuto l'accesso iniziale alla macchina, stabilizzare la maledetta reverse shell e trasferire binari per l'escalation è sempre il gradino immediatamente successivo (nonché il più fastidioso). Buttando un bel flag <code>--shell</code>, LazyPwn si trasforma nel tuo <strong>Post-Exploitation Buddy</strong>.</p>
-<p>!!! warning "It's dangerous to go alone!"
-    Quando ottieni una shell "dumb" tramite un web exploit, perdi history dei comandi, per sbaglio premi <code>Ctrl+C</code> e killi la tua stessa magica shell costringendoti a rifare tutto da capo... è letteralmente momento di usare il modulo shell.</p>
+<p><em>"It's dangerous to go alone!"</em><br />
+Quando ottieni una shell "dumb" tramite un web exploit, perdi history dei comandi, per sbaglio premi <code>Ctrl+C</code> e killi la tua stessa magica shell costringendoti a rifare tutto da capo... è letteralmente momento di usare il modulo shell.</p>
 <ol>
 <li><strong>Auto-Discovery:</strong> Rileva in automatico l'IP locale della tua interfaccia VPN (<code>tun0</code>).</li>
-<li><strong>Payload Staging:</strong> Tira sù in 1 decimo di secondo un server HTTP Python per hostare la tua cartellina <code>/tools</code> per roba come LinPEAS/winPEAS.</li>
-<li><strong>Weapon Forging:</strong> Lancia dinamicamente <code>msfvenom</code> per buttarti fuori reverse shell ELF (C) pre-configurate sul tuo IP, o shell web PHP/ASPX generandole on the fly.</li>
+<li><strong>Payload Staging:</strong> Tira sù un server HTTP Python per hostare la tua cartella <code>/tools</code> per roba come LinPEAS/winPEAS.</li>
+<li><strong>Weapon Forging:</strong> Lancia dinamicamente <code>msfvenom</code> per buttare fuori reverse shell ELF (C) pre-configurate sul tuo IP, o shell web PHP/ASPX generandole al fly.</li>
 <li><strong>Pivoting Automator:</strong> Genera la sintassi bash perfetta copioncollabile per fare il tunnel Chisel di ritorno alla tua macchina senza errori di battitura.</li>
 <li><strong>TTY Escaping:</strong> Stampa la famosa block chain <code>python3 -c 'import pty...; pty.spawn("/bin/bash")'</code> seguita da <code>stty raw -echo</code> così fai letteralmente solo due click.</li>
 </ol>
 <hr />
 <h2 id="6-gestione-dello-stato-e-quality-of-life">6. Gestione dello Stato e Quality of Life<a class="headerlink" href="#6-gestione-dello-stato-e-quality-of-life" title="Permanent link">&para;</a></h2>
-<p>Le connessioni VPN esplodono sempre nei CTF. LazyPwn usa un <strong>JSON State Manager</strong> (<code>state.json</code>) che tiene a memoria cosa o quali script sono completati.</p>
-<p>!!! tip "Quality of Life (Per i Pigri Veri)"
-    La v1.0 di LazyPwn porta tre QoL assurde:
+<p>Le connessioni VPN esplodono sempre durante le CTF; per ovviare si usa un <strong>JSON State Manager</strong> (<code>state.json</code>) che tiene a memoria cosa o quali script sono completati.</p>
+<p><em>QoL - (Quality of Life)</em>
     - <strong>Auto-Chown:</strong> Hai presente l'ansia di farti dumpare nmap report protetti da <code>root</code> che poi per leggerli o cancellarli devi fare il <code>sudo chown</code> ovunque? Finito. LazyPwn fa hook di se stesso a fine pipeline e ti ridà i permessi utente ai file. 
-    - <strong>Webhooks:</strong> Scansione finita. Script in background ti passa il bot di Slack o Discord con le info, porte, e loot trovato via message sul tuo canale privato.
-    - <strong>Interactive HTML Report:</strong> Tutto quello che dumpato, convertito via generator e sputato sul tuo hard disk come HTML per potersi leggere senza gli occhi da terminale.</p>
+    - <strong>Webhooks:</strong> Scansione finita? Uno script in background ti passa il bot di Slack o Discord con le info, porte, e loot trovato via message sul tuo canale privato.
+    - <strong>Interactive HTML Report:</strong> Tutto quello che è stato dumpato viene convertito via generator in HTML per una miglior lettura.</p>
 <hr />
 <h2 id="codice-sorgente-open-source">💻 Codice Sorgente &amp; Open Source<a class="headerlink" href="#codice-sorgente-open-source" title="Permanent link">&para;</a></h2>
-<p>LazyPwn è un progetto interamente open source rilasciato sotto licenza <strong>GNU GPL v3</strong>. Tutto il codice sorgente, l'architettura asincrona e i vari moduli sono disponibili pubblicamente. Se vuoi spulciare il codice, fare una pull request o semplicemente usarlo per la tua prossima CTF, trovi tutto qui: <strong><a href="https://github.com/marcop-sed/lazypwn">Visita la repository su GitHub</a></strong>.</p>
+<p>LazyPwn è un progetto interamente open source rilasciato sotto licenza <strong>GNU GPL v3</strong>. Tutto il codice sorgente, l'architettura e i vari moduli sono disponibili pubblicamente. Se vuoi spulciare il codice, fare una pull request o semplicemente usarlo per la tua prossima CTF, trovi tutto qui: <strong><a href="https://github.com/marcop-sed/lazypwn">Visita la repository su GitHub</a></strong>.</p>
 
 
 

